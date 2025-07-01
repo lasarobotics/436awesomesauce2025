@@ -5,8 +5,8 @@
 package frc.robot;
 
 import frc.robot.Constants.OperatorConstants;
-import frc.robot.subsystems.ExampleSubsystem;
-import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.subsystems.coral.CoralSubsystem;
+import frc.robot.subsystems.algae.AlgaeSubsystem;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
@@ -18,10 +18,13 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
  */
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
-  private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
+  private final CoralSubsystem m_coralSubsystem = CoralSubsystem.getInstance();
+  private final AlgaeSubsystem m_algaeIntakeSubsystem = new AlgaeSubsystem();
+
+  private final HeadHoncho HEAD_HONCHO = new HeadHoncho(m_coralSubsystem, m_algaeIntakeSubsystem);
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
-  private final CommandXboxController m_driverController =
+  private final CommandXboxController PRIMARY_CONTROLLER =
       new CommandXboxController(OperatorConstants.kDriverControllerPort);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
@@ -44,15 +47,6 @@ public class RobotContainer {
 
     // Schedule `exampleMethodCommand` when the Xbox controller's B button is pressed,
     // cancelling on release.
-    m_driverController.b().whileTrue(m_exampleSubsystem.exampleMethodCommand());
-  }
-
-  /**
-   * Use this to pass the autonomous command to the main {@link Robot} class.
-   *
-   * @return the command to run in autonomous
-   */
-  public Command getAutonomousCommand() {
-    // An example command will be run in autonomous
+    HEAD_HONCHO.bindControls(PRIMARY_CONTROLLER.x(), PRIMARY_CONTROLLER.rightBumper(), PRIMARY_CONTROLLER.rightTrigger(), PRIMARY_CONTROLLER.a());
   }
 }

@@ -16,4 +16,9 @@ public final class Constants {
   public static class OperatorConstants {
     public static final int kDriverControllerPort = 0;
   }
+
+  public static class CoralArmHardware {
+    public static final int ARM_MOTOR_ID = 0;
+    public static final int EFFECTOR_MOTOR_ID = 0;
+  }
 }

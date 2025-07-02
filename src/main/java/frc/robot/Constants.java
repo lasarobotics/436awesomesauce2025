@@ -18,7 +18,17 @@ public final class Constants {
   }
 
   public static class CoralArmHardware {
-    public static final int ARM_MOTOR_ID = 0;
+    public static final int ARM_MOTOR_ID = 0; // TODO: find these ids
     public static final int EFFECTOR_MOTOR_ID = 0;
+  }
+
+  public static class AlgaeHardware {
+    public static final int INTAKE_MOTOR_ID = 0; // TODO: find these ids
+    public static final int ARM_MOTOR_ID = 0;
+    public static final int SHOOTER_MOTOR_ID = 0;
+  }
+
+  public static class ClimbHardware {
+    public static final int ARM_MOTOR_ID = 0; // TODO: find these ids
   }
 }

@@ -12,12 +12,13 @@ import edu.wpi.first.units.measure.Dimensionless;
 import frc.robot.Constants;
 
 public class CoralSubsystem extends StateMachine implements AutoCloseable {
+
     public static record Hardware (
         SparkMax coralMotor,
         SparkMax armMotor
     ) {}
 
-    static final Dimensionless INTAKE_MOTOR_SPEED = Percent.of(100); // might need to swap these two
+    static final Dimensionless INTAKE_MOTOR_SPEED = Percent.of(100); // TODO might need to change these
     static final Dimensionless SCORE_MOTOR_SPEED = Percent.of(-100);
 
     public enum CoralSubsystemStates implements SystemState {
@@ -30,71 +31,58 @@ public class CoralSubsystem extends StateMachine implements AutoCloseable {
         REST {
             @Override
             public void initialize() {
-                s_coralSubsystemInstance.stopMotor();
-                s_coralSubsystemInstance.homeArm();
+                getInstance().stopMotor();
+                getInstance().stowArm();
             }
 
             @Override
             public SystemState nextState() {
-                return s_coralSubsystemInstance.nextState;
+                return getInstance().nextState;
             }
         },
         INTAKE {
             @Override
             public void initialize() {
-                s_coralSubsystemInstance.lowerArm();
+                getInstance().lowerArm();
             }
 
             @Override
             public void execute() {
-                if (s_coralSubsystemInstance.armAtGroundPosition()) {
-                    s_coralSubsystemInstance.intake();
+                if (getInstance().armAtGroundPosition()) {
+                    getInstance().intake();
                 }
             }
 
             @Override
             public SystemState nextState() {
-                return s_coralSubsystemInstance.nextState;
+                return getInstance().nextState;
             }
         },
         SCORE_POSITION {
             @Override
             public void initialize() {
-                s_coralSubsystemInstance.raiseArmToScore();
+                getInstance().raiseArm();
 
             }
 
             @Override
             public SystemState nextState() {
-                return s_coralSubsystemInstance.nextState;
+                return getInstance().nextState;
             }
         },
         SCORE {
             @Override
             public void execute() {
-                if (s_coralSubsystemInstance.armAtScoringPosition()) {
-                    s_coralSubsystemInstance.score();
+                if (getInstance().armAtScoringPosition()) {
+                    getInstance().score();
                 }
             }
 
             @Override
             public SystemState nextState() {
-                return s_coralSubsystemInstance.nextState;
+                return getInstance().nextState;
             }
         },
-        REGURGITATE {
-            @Override
-            public void initialize() {
-                // hawk tuah!
-                // TODO: make this move the arm up a little bit
-                s_coralSubsystemInstance.score();
-            }
-
-            @Override
-            public SystemState nextState() {
-                return s_coralSubsystemInstance.nextState;
-            }
-        }
     }
 
     private static CoralSubsystem s_coralSubsystemInstance;
@@ -140,7 +128,7 @@ public class CoralSubsystem extends StateMachine implements AutoCloseable {
         m_coralMotor.set(SCORE_MOTOR_SPEED.in(Value));
     }
     
-    public void homeArm() {
+    public void stowArm() {
         // set arm to a position here? idk how to do that TODO
     }
     
@@ -148,7 +136,7 @@ public class CoralSubsystem extends StateMachine implements AutoCloseable {
         // set arm to a position here? idk how to do that TODO
     }
     
-    public void raiseArmToScore() {
+    public void raiseArm() {
         // set arm to a position here? idk how to do that TODO
     }
 
@@ -163,5 +151,6 @@ public class CoralSubsystem extends StateMachine implements AutoCloseable {
     @Override
     public void close() {
         m_coralMotor.close();
+        m_armMotor.close();
     }
 }

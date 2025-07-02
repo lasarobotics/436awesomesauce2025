@@ -7,6 +7,7 @@ package frc.robot;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.coral.CoralSubsystem;
 import frc.robot.subsystems.algae.AlgaeSubsystem;
+import frc.robot.subsystems.climb.ClimbSubsystem;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
@@ -19,9 +20,14 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final CoralSubsystem m_coralSubsystem = CoralSubsystem.getInstance();
-  private final AlgaeSubsystem m_algaeIntakeSubsystem = new AlgaeSubsystem();
+  private final AlgaeSubsystem m_algaeIntakeSubsystem = AlgaeSubsystem.getInstance();
+  private final ClimbSubsystem m_climbSubsystem = ClimbSubsystem.getInstance();
 
-  private final HeadHoncho HEAD_HONCHO = new HeadHoncho(m_coralSubsystem, m_algaeIntakeSubsystem);
+  private final HeadHoncho HEAD_HONCHO = new HeadHoncho(
+    m_coralSubsystem,
+    m_algaeIntakeSubsystem,
+    m_climbSubsystem
+  );
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController PRIMARY_CONTROLLER =
@@ -47,6 +53,14 @@ public class RobotContainer {
 
     // Schedule `exampleMethodCommand` when the Xbox controller's B button is pressed,
     // cancelling on release.
-    HEAD_HONCHO.bindControls(PRIMARY_CONTROLLER.x(), PRIMARY_CONTROLLER.rightBumper(), PRIMARY_CONTROLLER.rightTrigger(), PRIMARY_CONTROLLER.a());
+    HEAD_HONCHO.bindControls(
+      PRIMARY_CONTROLLER.x(),               // cancel
+      PRIMARY_CONTROLLER.rightBumper(),     // intake coral
+      PRIMARY_CONTROLLER.rightTrigger(),    // score coral
+      PRIMARY_CONTROLLER.leftBumper(),      // intake algae
+      PRIMARY_CONTROLLER.leftTrigger(),     // shoot algae
+      PRIMARY_CONTROLLER.a(),               // descore algae
+      PRIMARY_CONTROLLER.y()                // climber management
+    );
   }
 }

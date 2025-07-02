@@ -60,7 +60,7 @@ public class RobotContainer {
       PRIMARY_CONTROLLER.leftBumper(),      // intake algae
       PRIMARY_CONTROLLER.leftTrigger(),     // shoot algae
       PRIMARY_CONTROLLER.a(),               // descore algae
-      PRIMARY_CONTROLLER.y()                // climber management
+      PRIMARY_CONTROLLER.b()                // climber management
     );
   }
 }

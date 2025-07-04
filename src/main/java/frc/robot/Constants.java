@@ -77,4 +77,8 @@ public final class Constants {
     public static final double I = 0.0;
     public static final double D = 0.0;
   }
+
+  public static class Swerve {
+    public static final double MAX_SPEED = 0.0; // TODO make this not zero
+  }
 }

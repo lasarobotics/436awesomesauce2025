@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
 
+  @SuppressWarnings("unused") // TODO this is probably fine
   private final RobotContainer m_robotContainer;
 
   /**

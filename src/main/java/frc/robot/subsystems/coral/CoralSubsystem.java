@@ -64,19 +64,12 @@ public class CoralSubsystem extends StateMachine implements AutoCloseable {
                 return getInstance().nextState;
             }
         },
-        SCORE_POSITION {
+        SCORE {
             @Override
             public void initialize() {
                 getInstance().raiseArm();
-
             }
 
-            @Override
-            public SystemState nextState() {
-                return getInstance().nextState;
-            }
-        },
-        SCORE {
             @Override
             public void execute() {
                 if (getInstance().armAtScoringPosition()) {

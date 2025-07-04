@@ -36,6 +36,7 @@ public class HeadHoncho extends StateMachine implements AutoCloseable {
             public void initialize() {
                 CORAL_SUBSYSTEM.setState(CoralSubsystemStates.REST);
                 ALGAE_SUBSYSTEM.setState(AlgaeSubsystemStates.REST);
+                CLIMB_SUBSYSTEM.setState(ClimbSubsystemStates.REST);
             }
 
             @Override
@@ -66,25 +67,7 @@ public class HeadHoncho extends StateMachine implements AutoCloseable {
                 if (s_DescoreAlgaeButton.getAsBoolean()) return DESCORE_ALGAE;
                 if (s_ShootAlgaeButton.getAsBoolean()) return SHOOT_ALGAE;
 
-                if (s_CancelButton.getAsBoolean()) return REST;
-
-                return this;
-            }
-        },
-        GO_TO_SCORE_CORAL {
-            @Override
-            public void initialize() {
-                CORAL_SUBSYSTEM.setState(CoralSubsystemStates.SCORE_POSITION);
-            }
-
-            @Override
-            public SystemState nextState() {
-                if (s_IntakeCoralButton.getAsBoolean()) return INTAKE_CORAL;
-
-                if (s_IntakeAlgaeButton.getAsBoolean()) return INTAKE_ALGAE;
-                if (s_DescoreAlgaeButton.getAsBoolean()) return DESCORE_ALGAE;
-                if (s_ShootAlgaeButton.getAsBoolean()) return SHOOT_ALGAE;
-
+                if (s_IntakeCoralButton.getAsBoolean()) return REST;
                 if (s_CancelButton.getAsBoolean()) return REST;
 
                 return this;
@@ -98,14 +81,13 @@ public class HeadHoncho extends StateMachine implements AutoCloseable {
 
             @Override
             public SystemState nextState() {
-                if (!CoralSubsystem.getInstance().armAtScoringPosition()) return GO_TO_SCORE_CORAL;
-
                 if (s_IntakeCoralButton.getAsBoolean()) return INTAKE_CORAL;
 
                 if (s_IntakeAlgaeButton.getAsBoolean()) return INTAKE_ALGAE;
                 if (s_DescoreAlgaeButton.getAsBoolean()) return DESCORE_ALGAE;
                 if (s_ShootAlgaeButton.getAsBoolean()) return SHOOT_ALGAE;
 
+                if (s_ScoreCoralButton.getAsBoolean()) return REST;
                 if (s_CancelButton.getAsBoolean()) return REST;
 
                 return this;

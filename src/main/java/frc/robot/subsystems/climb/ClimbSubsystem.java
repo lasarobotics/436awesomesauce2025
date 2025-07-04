@@ -1,16 +1,19 @@
 package frc.robot.subsystems.climb;
 
 import static edu.wpi.first.units.Units.Percent;
-import static edu.wpi.first.units.Units.Value;
 
 import org.lasarobotics.fsm.StateMachine;
 import org.lasarobotics.fsm.SystemState;
 import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.config.SparkMaxConfig;
+import com.revrobotics.RelativeEncoder;
+import com.revrobotics.spark.ClosedLoopSlot;
+import com.revrobotics.spark.SparkBase.ControlType;
+import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import edu.wpi.first.units.measure.Dimensionless;
 import frc.robot.Constants;
-import frc.robot.subsystems.coral.CoralSubsystem;
 
 public class ClimbSubsystem extends StateMachine implements AutoCloseable {
     
@@ -65,6 +68,9 @@ public class ClimbSubsystem extends StateMachine implements AutoCloseable {
 
     private static ClimbSubsystem s_climbSubsystemInstance;
     private final SparkMax m_climbMotor;
+    private final SparkClosedLoopController m_climbController;
+    private final RelativeEncoder m_climbEncoder;
+    private final SparkMaxConfig m_climbConfig;
     private ClimbSubsystemStates nextState;
 
     public static ClimbSubsystem getInstance() {
@@ -78,11 +84,23 @@ public class ClimbSubsystem extends StateMachine implements AutoCloseable {
         super(ClimbSubsystemStates.REST);
         this.nextState = ClimbSubsystemStates.REST;
         this.m_climbMotor = hardware.climbMotor;
+
+        m_climbConfig = new SparkMaxConfig();
+        this.m_climbConfig.closedLoop.maxMotion
+            .maxAcceleration(Constants.ClimbHardware.MAX_ARM_ACCELERATION)
+            .maxVelocity(Constants.ClimbHardware.MAX_ARM_VELOCIY)
+            .allowedClosedLoopError(Constants.ClimbHardware.ALLOWED_CLOSED_LOOP_ERROR);
+        this.m_climbConfig.closedLoop
+            .p(Constants.ClimbMotorPID.P)
+            .i(Constants.ClimbMotorPID.I)
+            .d(Constants.ClimbMotorPID.D);
+        this.m_climbController = this.m_climbMotor.getClosedLoopController();
+        this.m_climbEncoder = this.m_climbMotor.getEncoder();
     }
 
     public static Hardware initializeHardware() {
         Hardware coralSubsystemHardware = new Hardware(
-            new SparkMax(Constants.ClimbHardware.ARM_MOTOR_ID, MotorType.kBrushless) // yeah it's probably brushless TODO check
+            new SparkMax(Constants.ClimbHardware.ARM_MOTOR_ID, MotorType.kBrushless)
         );
         return coralSubsystemHardware;
     }
@@ -91,24 +109,36 @@ public class ClimbSubsystem extends StateMachine implements AutoCloseable {
         nextState = state;
     }
 
+    public void zeroRelativeEncoders() {
+        m_climbEncoder.setPosition(0.0);
+    }
+
     public void stopMotor() {
         m_climbMotor.stopMotor();
     }
 
     public void extendMotor() {
-        // set arm to a position here? idk how to do that TODO
+        m_climbController.setReference(
+            Constants.ClimbMotorSetpoints.EXTEND,
+            ControlType.kMAXMotionPositionControl,
+            ClosedLoopSlot.kSlot0
+        );
     }
 
     public void retractMotor() {
-        // set arm to a position here? idk how to do that TODO
+        m_climbController.setReference(
+            Constants.ClimbMotorSetpoints.RETRACT,
+            ControlType.kMAXMotionPositionControl,
+            ClosedLoopSlot.kSlot0
+        );
     }
 
     public boolean armExtended() {
-        return true; // update later TODO
+        return Math.abs(Constants.ClimbMotorSetpoints.EXTEND - m_climbEncoder.getPosition()) <= Constants.EPSILON;
     }
 
     public boolean armRetracted() {
-        return true; // update later TODO
+        return Math.abs(Constants.ClimbMotorSetpoints.RETRACT - m_climbEncoder.getPosition()) <= Constants.EPSILON;
     }
 
     public void close() {

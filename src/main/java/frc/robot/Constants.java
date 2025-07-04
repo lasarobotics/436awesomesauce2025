@@ -13,6 +13,8 @@ package frc.robot;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
+  public static final double EPSILON = 0.000001; // lgtm
+
   public static class OperatorConstants {
     public static final int kDriverControllerPort = 0;
   }
@@ -20,15 +22,59 @@ public final class Constants {
   public static class CoralArmHardware {
     public static final int ARM_MOTOR_ID = 0; // TODO: find these ids
     public static final int EFFECTOR_MOTOR_ID = 0;
+    public static final double MAX_ARM_VELOCIY = 0.0; // measured in rpm TODO
+    public static final double MAX_ARM_ACCELERATION = 0.0; // measured in rpm per second TODO
+    public static final double ALLOWED_CLOSED_LOOP_ERROR = 0.0; // measured in rotations TODO
+  }
+
+  public static class CoralArmSetpoints {
+    public static final double STOW = 0.0; // TODO figure these out
+    public static final double SCORE = 0.0;
+    public static final double INTAKE = 0.0;
+  }
+
+  public static class CoralArmPID {
+    public static final double P = 0.0; // TODO figure these out
+    public static final double I = 0.0;
+    public static final double D = 0.0;
   }
 
   public static class AlgaeHardware {
     public static final int INTAKE_MOTOR_ID = 0; // TODO: find these ids
     public static final int ARM_MOTOR_ID = 0;
     public static final int SHOOTER_MOTOR_ID = 0;
+    public static final double MAX_ARM_VELOCIY = 0.0; // measured in rpm TODO
+    public static final double MAX_ARM_ACCELERATION = 0.0; // measured in rpm per second TODO
+    public static final double ALLOWED_CLOSED_LOOP_ERROR = 0.0; // measured in rotations TODO
+  }
+
+  public static class AlgaeArmSetpoints {
+    public static final double STOW = 0.0; // TODO figure these out
+    public static final double DESCORE = 0.0;
+    public static final double INTAKE = 0.0;
+  }
+
+  public static class AlgaeArmPID {
+    public static final double P = 0.0; // TODO figure these out
+    public static final double I = 0.0;
+    public static final double D = 0.0;
   }
 
   public static class ClimbHardware {
     public static final int ARM_MOTOR_ID = 0; // TODO: find these ids
+    public static final double MAX_ARM_VELOCIY = 0.0; // measured in rpm TODO
+    public static final double MAX_ARM_ACCELERATION = 0.0; // measured in rpm per second TODO
+    public static final double ALLOWED_CLOSED_LOOP_ERROR = 0.0; // measured in rotations TODO
+  }
+
+  public static class ClimbMotorSetpoints {
+    public static final double EXTEND = 0.0; // TODO figure these out
+    public static final double RETRACT = 0.0;
+  }
+
+  public static class ClimbMotorPID {
+    public static final double P = 0.0; // TODO figure these out
+    public static final double I = 0.0;
+    public static final double D = 0.0;
   }
 }

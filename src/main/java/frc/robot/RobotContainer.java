@@ -20,12 +20,12 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final CoralSubsystem m_coralSubsystem = CoralSubsystem.getInstance();
-  private final AlgaeSubsystem m_algaeIntakeSubsystem = AlgaeSubsystem.getInstance();
+  private final AlgaeSubsystem m_algaeSubsystem = AlgaeSubsystem.getInstance();
   private final ClimbSubsystem m_climbSubsystem = ClimbSubsystem.getInstance();
 
   private final HeadHoncho HEAD_HONCHO = new HeadHoncho(
     m_coralSubsystem,
-    m_algaeIntakeSubsystem,
+    m_algaeSubsystem,
     m_climbSubsystem
   );
 
@@ -37,6 +37,7 @@ public class RobotContainer {
   public RobotContainer() {
     // Configure the trigger bindings
     configureBindings();
+    zeroRelativeEncoders();
   }
 
   /**
@@ -62,5 +63,11 @@ public class RobotContainer {
       PRIMARY_CONTROLLER.a(),               // descore algae
       PRIMARY_CONTROLLER.b()                // climber management
     );
+  }
+
+  private void zeroRelativeEncoders() {
+    m_algaeSubsystem.zeroRelativeEncoders();
+    m_coralSubsystem.zeroRelativeEncoders();
+    m_climbSubsystem.zeroRelativeEncoders();
   }
 }

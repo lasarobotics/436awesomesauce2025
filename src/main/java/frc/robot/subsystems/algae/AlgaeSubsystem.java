@@ -7,13 +7,17 @@ import org.lasarobotics.fsm.StateMachine;
 import org.lasarobotics.fsm.SystemState;
 
 import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.units.measure.Dimensionless;
 
+import com.revrobotics.RelativeEncoder;
+import com.revrobotics.spark.ClosedLoopSlot;
+import com.revrobotics.spark.SparkBase.ControlType;
+import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import frc.robot.Constants;
-import frc.robot.subsystems.coral.CoralSubsystem.CoralSubsystemStates;
 
 public class AlgaeSubsystem extends StateMachine implements AutoCloseable {
 
@@ -28,7 +32,7 @@ public class AlgaeSubsystem extends StateMachine implements AutoCloseable {
     static final Dimensionless SHOOTER_MOTOR_SPEED = Percent.of(100);
 
     public enum AlgaeSubsystemStates implements SystemState {
-        NOTHING { // TODO: note that NOTHING should be provided by default, if possible
+        NOTHING {
             @Override
             public SystemState nextState() {
                 return this;
@@ -92,6 +96,9 @@ public class AlgaeSubsystem extends StateMachine implements AutoCloseable {
     private final SparkMax m_armMotor;
     private final SparkMax m_intakeMotor;
     private final SparkMax m_shooterMotor;
+    private final SparkClosedLoopController m_armController;
+    private final RelativeEncoder m_armEncoder;
+    private final SparkMaxConfig m_armMotorConfig;
     private AlgaeSubsystemStates nextState;
 
     public static AlgaeSubsystem getInstance() {
@@ -107,11 +114,23 @@ public class AlgaeSubsystem extends StateMachine implements AutoCloseable {
         this.m_armMotor = hardware.armMotor;
         this.m_intakeMotor = hardware.intakeMotor;
         this.m_shooterMotor = hardware.shooterMotor;
+
+        m_armMotorConfig = new SparkMaxConfig();
+        this.m_armMotorConfig.closedLoop.maxMotion
+            .maxAcceleration(Constants.AlgaeHardware.MAX_ARM_ACCELERATION)
+            .maxVelocity(Constants.AlgaeHardware.MAX_ARM_VELOCIY)
+            .allowedClosedLoopError(Constants.AlgaeHardware.ALLOWED_CLOSED_LOOP_ERROR);
+        this.m_armMotorConfig.closedLoop
+            .p(Constants.AlgaeArmPID.P)
+            .i(Constants.AlgaeArmPID.I)
+            .d(Constants.AlgaeArmPID.D);
+        this.m_armController = this.m_armMotor.getClosedLoopController();
+        this.m_armEncoder = this.m_armMotor.getEncoder();
     }
 
     public static Hardware initializeHardware() {
         Hardware algaeSubsystemHardware = new Hardware(
-            new SparkMax(Constants.AlgaeHardware.ARM_MOTOR_ID, MotorType.kBrushless), // yeah it's probably brushless TODO check
+            new SparkMax(Constants.AlgaeHardware.ARM_MOTOR_ID, MotorType.kBrushless),
             new SparkMax(Constants.AlgaeHardware.INTAKE_MOTOR_ID, MotorType.kBrushless),
             new SparkMax(Constants.AlgaeHardware.SHOOTER_MOTOR_ID, MotorType.kBrushless)
         );
@@ -120,6 +139,10 @@ public class AlgaeSubsystem extends StateMachine implements AutoCloseable {
 
     public void setState(AlgaeSubsystemStates state) {
         nextState = state;
+    }
+
+    public void zeroRelativeEncoders() {
+        m_armEncoder.setPosition(0.0);
     }
 
     public void stopIntake() {
@@ -143,27 +166,39 @@ public class AlgaeSubsystem extends StateMachine implements AutoCloseable {
     }
 
     public void raiseArm() {
-        // set arm to a position here? idk how to do that TODO
+        m_armController.setReference(
+            Constants.AlgaeArmSetpoints.DESCORE,
+            ControlType.kMAXMotionPositionControl,
+            ClosedLoopSlot.kSlot0
+        );
     }
 
     public void lowerArm() {
-        // set arm to a position here? idk how to do that TODO
+        m_armController.setReference(
+            Constants.AlgaeArmSetpoints.INTAKE,
+            ControlType.kMAXMotionPositionControl,
+            ClosedLoopSlot.kSlot0
+        );
     }
 
     public void stowArm() {
-        // set arm to a position here? idk how to do that TODO
+        m_armController.setReference(
+            Constants.AlgaeArmSetpoints.STOW,
+            ControlType.kMAXMotionPositionControl,
+            ClosedLoopSlot.kSlot0
+        );
     }
 
     public boolean isArmRaised() {
-        return true; // update later TODO
+        return Math.abs(Constants.AlgaeArmSetpoints.DESCORE - m_armEncoder.getPosition()) <= Constants.EPSILON;
     }
 
     public boolean isArmLowered() {
-        return true; // update later TODO
+        return Math.abs(Constants.AlgaeArmSetpoints.INTAKE - m_armEncoder.getPosition()) <= Constants.EPSILON;
     }
 
     public boolean isArmStowed() {
-        return true; // update later TODO
+        return Math.abs(Constants.AlgaeArmSetpoints.STOW - m_armEncoder.getPosition()) <= Constants.EPSILON;
     }
 
     @Override

@@ -1,6 +1,7 @@
 package frc.robot;
 
 import java.util.function.BooleanSupplier;
+import java.util.function.DoubleSupplier;
 
 import org.lasarobotics.fsm.StateMachine;
 import org.lasarobotics.fsm.SystemState;
@@ -12,6 +13,7 @@ import frc.robot.subsystems.climb.ClimbSubsystem;
 import frc.robot.subsystems.climb.ClimbSubsystem.ClimbSubsystemStates;
 import frc.robot.subsystems.coral.CoralSubsystem;
 import frc.robot.subsystems.coral.CoralSubsystem.CoralSubsystemStates;
+import frc.robot.subsystems.drive.DriveSubsystem;
 
 public class HeadHoncho extends StateMachine implements AutoCloseable {
 
@@ -185,6 +187,7 @@ public class HeadHoncho extends StateMachine implements AutoCloseable {
     private static CoralSubsystem CORAL_SUBSYSTEM;
     private static AlgaeSubsystem ALGAE_SUBSYSTEM;
     private static ClimbSubsystem CLIMB_SUBSYSTEM;
+    private static DriveSubsystem DRIVE_SUBSYSTEM;
 
     private static BooleanSupplier s_CancelButton;
 
@@ -200,7 +203,8 @@ public class HeadHoncho extends StateMachine implements AutoCloseable {
     public HeadHoncho (
         CoralSubsystem coralSubsystem,
         AlgaeSubsystem algaeSubsystem,
-        ClimbSubsystem climbSubsystem
+        ClimbSubsystem climbSubsystem,
+        DriveSubsystem driveSubsystem
     ) {
         super(State.REST);
         CORAL_SUBSYSTEM = coralSubsystem;
@@ -209,7 +213,9 @@ public class HeadHoncho extends StateMachine implements AutoCloseable {
     }
 
     public void bindControls(
-        // TODO figure out driving
+        DoubleSupplier leftX,
+        DoubleSupplier leftY,
+        DoubleSupplier rightX,
         BooleanSupplier cancelButton,
         BooleanSupplier intakeCoralButton,
         BooleanSupplier scoreCoralButton,
@@ -218,6 +224,7 @@ public class HeadHoncho extends StateMachine implements AutoCloseable {
         BooleanSupplier descoreAlgaeButton,
         BooleanSupplier climbButton
     ) {
+        DRIVE_SUBSYSTEM.setControls(leftX, leftY, rightX);
         s_CancelButton = cancelButton;
         s_IntakeCoralButton = intakeCoralButton;
         s_ScoreCoralButton = scoreCoralButton;

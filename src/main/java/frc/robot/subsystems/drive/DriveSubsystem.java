@@ -6,6 +6,7 @@ import java.util.function.DoubleSupplier;
 import org.lasarobotics.fsm.SystemState;
 import org.lasarobotics.fsm.StateMachine;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Filesystem;
 
 public class DriveSubsystem extends StateMachine implements AutoCloseable {
 
@@ -45,24 +46,25 @@ public class DriveSubsystem extends StateMachine implements AutoCloseable {
 
     public static DriveSubsystem getInstance() {
         if (s_driveSubsystemInstance == null) {
-            throw new RuntimeException("Drive subsystem not constructed before access");
+            s_driveSubsystemInstance = new DriveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve"));
         }
         return s_driveSubsystemInstance;
     }
 
     public DriveSubsystem(
-            DoubleSupplier leftX,
-            DoubleSupplier leftY,
-            DoubleSupplier rightX,
             File directory) {
         super(DriveSubsystemStates.AUTO);
 
         m_swerveManager = new SwerveManager(directory);
+    }
+
+    public void setControls(
+            DoubleSupplier leftX,
+            DoubleSupplier leftY,
+            DoubleSupplier rightX) {
         m_leftX = leftX;
         m_leftY = leftY;
         m_rightX = rightX;
-
-        s_driveSubsystemInstance = this;
     }
 
     public void drive() {

@@ -6,6 +6,7 @@ package frc.robot;
 
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.coral.CoralSubsystem;
+import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.algae.AlgaeSubsystem;
 import frc.robot.subsystems.climb.ClimbSubsystem;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -22,11 +23,13 @@ public class RobotContainer {
   private final CoralSubsystem m_coralSubsystem = CoralSubsystem.getInstance();
   private final AlgaeSubsystem m_algaeSubsystem = AlgaeSubsystem.getInstance();
   private final ClimbSubsystem m_climbSubsystem = ClimbSubsystem.getInstance();
+  private final DriveSubsystem m_driveSubsystem = DriveSubsystem.getInstance();
 
   private final HeadHoncho HEAD_HONCHO = new HeadHoncho(
     m_coralSubsystem,
     m_algaeSubsystem,
-    m_climbSubsystem
+    m_climbSubsystem,
+    m_driveSubsystem
   );
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
@@ -55,6 +58,9 @@ public class RobotContainer {
     // Schedule `exampleMethodCommand` when the Xbox controller's B button is pressed,
     // cancelling on release.
     HEAD_HONCHO.bindControls(
+      () -> PRIMARY_CONTROLLER.getLeftX(),
+      () -> PRIMARY_CONTROLLER.getLeftY(),
+      () -> PRIMARY_CONTROLLER.getRightX(),
       PRIMARY_CONTROLLER.x(),               // cancel
       PRIMARY_CONTROLLER.rightBumper(),     // intake coral
       PRIMARY_CONTROLLER.rightTrigger(),    // score coral

@@ -25,13 +25,6 @@ public class RobotContainer {
   private final ClimbSubsystem m_climbSubsystem = ClimbSubsystem.getInstance();
   private final DriveSubsystem m_driveSubsystem = DriveSubsystem.getInstance();
 
-  private final HeadHoncho HEAD_HONCHO = new HeadHoncho(
-    m_coralSubsystem,
-    m_algaeSubsystem,
-    m_climbSubsystem,
-    m_driveSubsystem
-  );
-
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController PRIMARY_CONTROLLER =
       new CommandXboxController(OperatorConstants.kDriverControllerPort);

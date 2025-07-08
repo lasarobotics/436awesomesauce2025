@@ -3,6 +3,8 @@ package frc.robot.subsystems.coral;
 import static edu.wpi.first.units.Units.Percent;
 import static edu.wpi.first.units.Units.Value;
 
+import java.util.function.BooleanSupplier;
+
 import org.lasarobotics.fsm.StateMachine;
 import org.lasarobotics.fsm.SystemState;
 
@@ -38,48 +40,75 @@ public class CoralSubsystem extends StateMachine implements AutoCloseable {
             @Override
             public void initialize() {
                 getInstance().stopMotor();
-                getInstance().stowArm();
+                getInstance().sendArmToSetpoint(Constants.CoralArmSetpoints.STOW);
             }
 
             @Override
             public SystemState nextState() {
-                return getInstance().nextState;
+                if (getInstance().m_intakeCoralButton.getAsBoolean()) return INTAKE;
+                if (getInstance().m_scoreCoralButton.getAsBoolean()) return SCORE;
+                if (getInstance().m_regurgitateButton.getAsBoolean()) return REGURGITATE;
+
+                return this;
             }
         },
         INTAKE {
             @Override
             public void initialize() {
-                getInstance().lowerArm();
+                getInstance().sendArmToSetpoint(Constants.CoralArmSetpoints.INTAKE);
             }
 
             @Override
             public void execute() {
-                if (getInstance().armAtGroundPosition()) {
-                    getInstance().intake();
+                if (getInstance().isArmAtSetpoint(Constants.CoralArmSetpoints.INTAKE)) {
+                    getInstance().setMotorToSpeed(INTAKE_MOTOR_SPEED);
                 }
             }
 
             @Override
             public SystemState nextState() {
-                return getInstance().nextState;
+                if (getInstance().m_cancelButton.getAsBoolean()) return REST;
+                if (getInstance().m_scoreCoralButton.getAsBoolean()) return SCORE;
+                if (getInstance().m_regurgitateButton.getAsBoolean()) return REGURGITATE;
+
+                return this;
             }
         },
         SCORE {
             @Override
             public void initialize() {
-                getInstance().raiseArm();
+                getInstance().sendArmToSetpoint(Constants.CoralArmSetpoints.SCORE);
             }
 
             @Override
             public void execute() {
-                if (getInstance().armAtScoringPosition()) {
-                    getInstance().score();
+                if (getInstance().isArmAtSetpoint(Constants.CoralArmSetpoints.SCORE)) {
+                    getInstance().setMotorToSpeed(SCORE_MOTOR_SPEED);
                 }
             }
 
             @Override
             public SystemState nextState() {
-                return getInstance().nextState;
+                if (getInstance().m_cancelButton.getAsBoolean()) return REST;
+                if (getInstance().m_intakeCoralButton.getAsBoolean()) return INTAKE;
+                if (getInstance().m_regurgitateButton.getAsBoolean()) return REGURGITATE;
+
+                return this;
+            }
+        },
+        REGURGITATE {
+            @Override
+            public void initialize() {
+                getInstance().setMotorToSpeed(SCORE_MOTOR_SPEED);
+            }
+
+            @Override
+            public SystemState nextState() {
+                if (getInstance().m_cancelButton.getAsBoolean()) return REST;
+                if (getInstance().m_intakeCoralButton.getAsBoolean()) return INTAKE;
+                if (getInstance().m_scoreCoralButton.getAsBoolean()) return SCORE;
+
+                return this;
             }
         },
     }
@@ -90,7 +119,10 @@ public class CoralSubsystem extends StateMachine implements AutoCloseable {
     private final SparkClosedLoopController m_armController;
     private final RelativeEncoder m_armEncoder;
     private final SparkMaxConfig m_armMotorConfig;
-    private CoralSubsystemStates nextState;
+    private BooleanSupplier m_cancelButton;
+    private BooleanSupplier m_intakeCoralButton;
+    private BooleanSupplier m_scoreCoralButton;
+    private BooleanSupplier m_regurgitateButton;
 
     public static CoralSubsystem getInstance() {
         if (s_coralSubsystemInstance == null) {
@@ -101,7 +133,6 @@ public class CoralSubsystem extends StateMachine implements AutoCloseable {
 
     public CoralSubsystem(Hardware hardware) {
         super(CoralSubsystemStates.REST);
-        this.nextState = CoralSubsystemStates.REST;
         this.m_coralMotor = hardware.coralMotor;
         this.m_armMotor = hardware.armMotor;
 
@@ -126,8 +157,16 @@ public class CoralSubsystem extends StateMachine implements AutoCloseable {
         return coralSubsystemHardware;
     }
 
-    public void setState(CoralSubsystemStates state) {
-        nextState = state;
+    public void configureBindings(
+        BooleanSupplier cancelButton,
+        BooleanSupplier intakeCoralButton,
+        BooleanSupplier scoreCoralButton,
+        BooleanSupplier regurgitateButton
+    ) {
+        m_cancelButton = cancelButton;
+        m_intakeCoralButton = intakeCoralButton;
+        m_scoreCoralButton = scoreCoralButton;
+        m_regurgitateButton = regurgitateButton;
     }
 
     public void zeroRelativeEncoders() {
@@ -138,48 +177,20 @@ public class CoralSubsystem extends StateMachine implements AutoCloseable {
         m_coralMotor.stopMotor();
     }
 
-    public void intake() {
-        m_coralMotor.set(INTAKE_MOTOR_SPEED.in(Value));
+    public void setMotorToSpeed(Dimensionless speed) {
+        m_coralMotor.set(speed.in(Value));
     }
 
-    public void score() {
-        m_coralMotor.set(SCORE_MOTOR_SPEED.in(Value));
-    }
-    
-    public void stowArm() {
+    public void sendArmToSetpoint(double setpoint) {
         m_armController.setReference(
-            Constants.CoralArmSetpoints.STOW,
-            ControlType.kMAXMotionPositionControl,
-            ClosedLoopSlot.kSlot0
-        );
-    }
-    
-    public void lowerArm() {
-        m_armController.setReference(
-            Constants.CoralArmSetpoints.INTAKE,
-            ControlType.kMAXMotionPositionControl,
-            ClosedLoopSlot.kSlot0
-        );
-    }
-    
-    public void raiseArm() {
-        m_armController.setReference(
-            Constants.CoralArmSetpoints.SCORE,
+            setpoint,
             ControlType.kMAXMotionPositionControl,
             ClosedLoopSlot.kSlot0
         );
     }
 
-    public boolean armStowed() {
-        return Math.abs(Constants.CoralArmSetpoints.STOW - m_armEncoder.getPosition()) <= Constants.EPSILON;
-    }
-
-    public boolean armAtGroundPosition() {
-        return Math.abs(Constants.CoralArmSetpoints.INTAKE - m_armEncoder.getPosition()) <= Constants.EPSILON;
-    }
-
-    public boolean armAtScoringPosition() {
-        return Math.abs(Constants.CoralArmSetpoints.SCORE - m_armEncoder.getPosition()) <= Constants.EPSILON;
+    public boolean isArmAtSetpoint(double setpoint) {
+        return Math.abs(setpoint - m_armEncoder.getPosition()) <= Constants.CoralArmHardware.ALLOWED_CLOSED_LOOP_ERROR;
     }
 
     @Override

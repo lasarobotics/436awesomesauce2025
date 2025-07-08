@@ -6,6 +6,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.function.DoubleSupplier;
 
+import com.studica.frc.AHRS;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -66,5 +68,10 @@ public class SwerveManager {
             Math.pow(rotationX.getAsDouble(), 3) * swerveDrive.getMaximumChassisAngularVelocity(),
             true, // drive relative to field
             false); // make it closed loop
+    }
+
+    public void zeroGyro() {
+        AHRS navx = (AHRS) swerveDrive.getGyro().getIMU();
+        navx.zeroYaw();
     }
 }

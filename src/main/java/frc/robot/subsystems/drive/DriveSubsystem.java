@@ -58,7 +58,7 @@ public class DriveSubsystem extends StateMachine implements AutoCloseable {
         m_swerveManager = new SwerveManager(directory);
     }
 
-    public void setControls(
+    public void configureBindings(
             DoubleSupplier leftX,
             DoubleSupplier leftY,
             DoubleSupplier rightX) {
@@ -69,6 +69,10 @@ public class DriveSubsystem extends StateMachine implements AutoCloseable {
 
     public void drive() {
         m_swerveManager.drive(m_leftX, m_leftY, m_rightX);
+    }
+
+    public void zeroGyro() {
+        m_swerveManager.zeroGyro();
     }
 
     public void close() {}

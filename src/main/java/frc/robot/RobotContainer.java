@@ -57,17 +57,27 @@ public class RobotContainer {
 
     // Schedule `exampleMethodCommand` when the Xbox controller's B button is pressed,
     // cancelling on release.
-    HEAD_HONCHO.bindControls(
-      () -> PRIMARY_CONTROLLER.getLeftX(),
-      () -> PRIMARY_CONTROLLER.getLeftY(),
-      () -> PRIMARY_CONTROLLER.getRightX(),
-      PRIMARY_CONTROLLER.x(),               // cancel
-      PRIMARY_CONTROLLER.rightBumper(),     // intake coral
-      PRIMARY_CONTROLLER.rightTrigger(),    // score coral
-      PRIMARY_CONTROLLER.leftBumper(),      // intake algae
-      PRIMARY_CONTROLLER.leftTrigger(),     // shoot algae
-      PRIMARY_CONTROLLER.a(),               // descore algae
-      PRIMARY_CONTROLLER.b()                // climber management
+    m_driveSubsystem.configureBindings(
+      () -> PRIMARY_CONTROLLER.getLeftX(),    // drive left and right
+      () -> PRIMARY_CONTROLLER.getLeftY(),    // drive forward and back
+      () -> PRIMARY_CONTROLLER.getRightX()    // drive rotate
+    );
+    m_algaeSubsystem.configureBindings(
+      PRIMARY_CONTROLLER.x(),                 // cancel
+      PRIMARY_CONTROLLER.leftBumper(),        // intake algae
+      PRIMARY_CONTROLLER.leftTrigger(),       // shoot algae
+      PRIMARY_CONTROLLER.a(),                 // descore algae
+      PRIMARY_CONTROLLER.back()               // regurgitate
+    );
+    m_climbSubsystem.configureBindings(
+      PRIMARY_CONTROLLER.x(),                 // cancel
+      PRIMARY_CONTROLLER.b()                  // climber management
+    );
+    m_coralSubsystem.configureBindings(
+      PRIMARY_CONTROLLER.x(),                 // cancel
+      PRIMARY_CONTROLLER.rightBumper(),       // intake coral
+      PRIMARY_CONTROLLER.rightTrigger(),      // score coral
+      PRIMARY_CONTROLLER.back()               // regurgitate
     );
   }
 
@@ -75,5 +85,6 @@ public class RobotContainer {
     m_algaeSubsystem.zeroRelativeEncoders();
     m_coralSubsystem.zeroRelativeEncoders();
     m_climbSubsystem.zeroRelativeEncoders();
+    m_driveSubsystem.zeroGyro();
   }
 }

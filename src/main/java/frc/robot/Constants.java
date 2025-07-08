@@ -43,6 +43,7 @@ public final class Constants {
     public static final int INTAKE_MOTOR_ID = 0; // TODO: find these ids
     public static final int ARM_MOTOR_ID = 0;
     public static final int SHOOTER_MOTOR_ID = 0;
+    public static final int BEAM_BREAK_ID = 0;
     public static final double MAX_ARM_VELOCIY = 0.0; // measured in rpm TODO
     public static final double MAX_ARM_ACCELERATION = 0.0; // measured in rpm per second TODO
     public static final double ALLOWED_CLOSED_LOOP_ERROR = 0.0; // measured in rotations TODO

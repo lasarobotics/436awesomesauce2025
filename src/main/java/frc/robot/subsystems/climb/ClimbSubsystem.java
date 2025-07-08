@@ -2,6 +2,7 @@ package frc.robot.subsystems.climb;
 
 import static edu.wpi.first.units.Units.Percent;
 
+import java.util.function.BooleanSupplier;
 import org.lasarobotics.fsm.StateMachine;
 import org.lasarobotics.fsm.SystemState;
 import com.revrobotics.spark.SparkMax;
@@ -39,29 +40,34 @@ public class ClimbSubsystem extends StateMachine implements AutoCloseable {
 
             @Override
             public SystemState nextState() {
-                return getInstance().nextState;
+                if (getInstance().m_climberManagementButton.getAsBoolean()) return RETRACT;
+                return this;
             }
         },
         EXTEND {
             @Override
             public void initialize() {
-                getInstance().extendMotor();
+                getInstance().sendMotorToSetpoint(Constants.ClimbMotorSetpoints.EXTEND);
             }
 
             @Override
             public SystemState nextState() {
-                return getInstance().nextState;
+                if (getInstance().m_climberManagementButton.getAsBoolean()) return RETRACT;
+                if (getInstance().m_cancelButton.getAsBoolean()) return REST;
+                return this;
             }
         },
         RETRACT {
             @Override
             public void initialize() {
-                getInstance().retractMotor();
+                getInstance().sendMotorToSetpoint(Constants.ClimbMotorSetpoints.RETRACT);
             }
 
             @Override
             public SystemState nextState() {
-                return getInstance().nextState;
+                if (getInstance().m_climberManagementButton.getAsBoolean()) return EXTEND;
+                if (getInstance().m_cancelButton.getAsBoolean()) return REST;
+                return this;
             }
         }
     }
@@ -71,7 +77,8 @@ public class ClimbSubsystem extends StateMachine implements AutoCloseable {
     private final SparkClosedLoopController m_climbController;
     private final RelativeEncoder m_climbEncoder;
     private final SparkMaxConfig m_climbConfig;
-    private ClimbSubsystemStates nextState;
+    private BooleanSupplier m_cancelButton;
+    private BooleanSupplier m_climberManagementButton;
 
     public static ClimbSubsystem getInstance() {
         if (s_climbSubsystemInstance == null) {
@@ -82,7 +89,6 @@ public class ClimbSubsystem extends StateMachine implements AutoCloseable {
 
     public ClimbSubsystem(Hardware hardware) {
         super(ClimbSubsystemStates.REST);
-        this.nextState = ClimbSubsystemStates.REST;
         this.m_climbMotor = hardware.climbMotor;
 
         m_climbConfig = new SparkMaxConfig();
@@ -105,8 +111,12 @@ public class ClimbSubsystem extends StateMachine implements AutoCloseable {
         return coralSubsystemHardware;
     }
 
-    public void setState(ClimbSubsystemStates state) {
-        nextState = state;
+    public void configureBindings(
+        BooleanSupplier cancelButton,
+        BooleanSupplier climberManagementButton
+    ) {
+        m_cancelButton = cancelButton;
+        m_climberManagementButton = climberManagementButton;
     }
 
     public void zeroRelativeEncoders() {
@@ -117,28 +127,16 @@ public class ClimbSubsystem extends StateMachine implements AutoCloseable {
         m_climbMotor.stopMotor();
     }
 
-    public void extendMotor() {
+    public void sendMotorToSetpoint(double setpoint) {
         m_climbController.setReference(
-            Constants.ClimbMotorSetpoints.EXTEND,
+            setpoint,
             ControlType.kMAXMotionPositionControl,
             ClosedLoopSlot.kSlot0
         );
     }
 
-    public void retractMotor() {
-        m_climbController.setReference(
-            Constants.ClimbMotorSetpoints.RETRACT,
-            ControlType.kMAXMotionPositionControl,
-            ClosedLoopSlot.kSlot0
-        );
-    }
-
-    public boolean armExtended() {
-        return Math.abs(Constants.ClimbMotorSetpoints.EXTEND - m_climbEncoder.getPosition()) <= Constants.EPSILON;
-    }
-
-    public boolean armRetracted() {
-        return Math.abs(Constants.ClimbMotorSetpoints.RETRACT - m_climbEncoder.getPosition()) <= Constants.EPSILON;
+    public boolean isClimberAtSetpoint(double setpoint) {
+        return Math.abs(setpoint - m_climbEncoder.getPosition()) <= Constants.EPSILON;
     }
 
     public void close() {

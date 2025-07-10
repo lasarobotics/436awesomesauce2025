@@ -63,20 +63,11 @@ public final class Constants {
 
   public static class ClimbHardware {
     public static final int ARM_MOTOR_ID = 61;
-    public static final double MAX_ARM_VELOCIY = 0.0; // measured in rpm TODO
-    public static final double MAX_ARM_ACCELERATION = 0.0; // measured in rpm per second TODO
-    public static final double ALLOWED_CLOSED_LOOP_ERROR = 0.0; // measured in rotations TODO
   }
 
   public static class ClimbMotorSetpoints {
     public static final double EXTEND = 0.0; // TODO figure these out
     public static final double RETRACT = 0.0;
-  }
-
-  public static class ClimbMotorPID {
-    public static final double P = 0.0; // TODO figure these out
-    public static final double I = 0.0;
-    public static final double D = 0.0;
   }
 
   public static class Swerve {

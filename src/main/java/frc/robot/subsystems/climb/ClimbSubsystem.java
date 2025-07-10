@@ -1,16 +1,13 @@
 package frc.robot.subsystems.climb;
 
 import static edu.wpi.first.units.Units.Percent;
+import static edu.wpi.first.units.Units.Value;
 
 import java.util.function.BooleanSupplier;
 import org.lasarobotics.fsm.StateMachine;
 import org.lasarobotics.fsm.SystemState;
 import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.RelativeEncoder;
-import com.revrobotics.spark.ClosedLoopSlot;
-import com.revrobotics.spark.SparkBase.ControlType;
-import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import edu.wpi.first.units.measure.Dimensionless;
@@ -47,26 +44,40 @@ public class ClimbSubsystem extends StateMachine implements AutoCloseable {
         EXTEND {
             @Override
             public void initialize() {
-                getInstance().sendMotorToSetpoint(Constants.ClimbMotorSetpoints.EXTEND);
+                getInstance().setMotorSpeed(EXTEND_MOTOR_SPEED);
+            }
+
+            public void execute() {
+                if (getInstance().isClimberAtSetpoint(Constants.ClimbMotorSetpoints.EXTEND)) {
+                    getInstance().stopMotor();
+                }
             }
 
             @Override
             public SystemState nextState() {
                 if (getInstance().m_climberManagementButton.getAsBoolean()) return RETRACT;
-                if (getInstance().m_cancelButton.getAsBoolean()) return REST;
+                if (getInstance().m_cancelButton.getAsBoolean() ||
+                    getInstance().isClimberAtSetpoint(Constants.ClimbMotorSetpoints.EXTEND)) return REST;
                 return this;
             }
         },
         RETRACT {
             @Override
             public void initialize() {
-                getInstance().sendMotorToSetpoint(Constants.ClimbMotorSetpoints.RETRACT);
+                getInstance().setMotorSpeed(RETRACT_MOTOR_SPEED);
+            }
+
+            public void execute() {
+                if (getInstance().isClimberAtSetpoint(Constants.ClimbMotorSetpoints.RETRACT)) {
+                    getInstance().stopMotor();
+                }
             }
 
             @Override
             public SystemState nextState() {
                 if (getInstance().m_climberManagementButton.getAsBoolean()) return EXTEND;
-                if (getInstance().m_cancelButton.getAsBoolean()) return REST;
+                if (getInstance().m_cancelButton.getAsBoolean() ||
+                    getInstance().isClimberAtSetpoint(Constants.ClimbMotorSetpoints.RETRACT)) return REST;
                 return this;
             }
         }
@@ -74,9 +85,7 @@ public class ClimbSubsystem extends StateMachine implements AutoCloseable {
 
     private static ClimbSubsystem s_climbSubsystemInstance;
     private final SparkMax m_climbMotor;
-    private final SparkClosedLoopController m_climbController;
     private final RelativeEncoder m_climbEncoder;
-    private final SparkMaxConfig m_climbConfig;
     private BooleanSupplier m_cancelButton;
     private BooleanSupplier m_climberManagementButton;
 
@@ -91,16 +100,6 @@ public class ClimbSubsystem extends StateMachine implements AutoCloseable {
         super(ClimbSubsystemStates.REST);
         this.m_climbMotor = hardware.climbMotor;
 
-        m_climbConfig = new SparkMaxConfig();
-        this.m_climbConfig.closedLoop.maxMotion
-            .maxAcceleration(Constants.ClimbHardware.MAX_ARM_ACCELERATION)
-            .maxVelocity(Constants.ClimbHardware.MAX_ARM_VELOCIY)
-            .allowedClosedLoopError(Constants.ClimbHardware.ALLOWED_CLOSED_LOOP_ERROR);
-        this.m_climbConfig.closedLoop
-            .p(Constants.ClimbMotorPID.P)
-            .i(Constants.ClimbMotorPID.I)
-            .d(Constants.ClimbMotorPID.D);
-        this.m_climbController = this.m_climbMotor.getClosedLoopController();
         this.m_climbEncoder = this.m_climbMotor.getEncoder();
     }
 
@@ -126,13 +125,9 @@ public class ClimbSubsystem extends StateMachine implements AutoCloseable {
     public void stopMotor() {
         m_climbMotor.stopMotor();
     }
-
-    public void sendMotorToSetpoint(double setpoint) {
-        m_climbController.setReference(
-            setpoint,
-            ControlType.kMAXMotionPositionControl,
-            ClosedLoopSlot.kSlot0
-        );
+    
+    public void setMotorSpeed(Dimensionless speed) {
+        m_climbMotor.set(speed.in(Value));
     }
 
     public boolean isClimberAtSetpoint(double setpoint) {

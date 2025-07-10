@@ -20,8 +20,8 @@ public final class Constants {
   }
 
   public static class CoralArmHardware {
-    public static final int ARM_MOTOR_ID = 0; // TODO: find these ids
-    public static final int EFFECTOR_MOTOR_ID = 0;
+    public static final int ARM_MOTOR_ID = 52;
+    public static final int EFFECTOR_MOTOR_ID = 51;
     public static final double MAX_ARM_VELOCIY = 0.0; // measured in rpm TODO
     public static final double MAX_ARM_ACCELERATION = 0.0; // measured in rpm per second TODO
     public static final double ALLOWED_CLOSED_LOOP_ERROR = 0.0; // measured in rotations TODO
@@ -62,7 +62,7 @@ public final class Constants {
   }
 
   public static class ClimbHardware {
-    public static final int ARM_MOTOR_ID = 0; // TODO: find these ids
+    public static final int ARM_MOTOR_ID = 61;
     public static final double MAX_ARM_VELOCIY = 0.0; // measured in rpm TODO
     public static final double MAX_ARM_ACCELERATION = 0.0; // measured in rpm per second TODO
     public static final double ALLOWED_CLOSED_LOOP_ERROR = 0.0; // measured in rotations TODO

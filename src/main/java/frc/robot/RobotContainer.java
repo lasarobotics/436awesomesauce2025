@@ -21,8 +21,8 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final CoralSubsystem m_coralSubsystem = CoralSubsystem.getInstance();
-  private final AlgaeSubsystem m_algaeSubsystem = AlgaeSubsystem.getInstance();
-  private final ClimbSubsystem m_climbSubsystem = ClimbSubsystem.getInstance();
+  // private final AlgaeSubsystem m_algaeSubsystem = AlgaeSubsystem.getInstance();
+  // private final ClimbSubsystem m_climbSubsystem = ClimbSubsystem.getInstance();
   private final DriveSubsystem m_driveSubsystem = DriveSubsystem.getInstance();
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
@@ -55,17 +55,17 @@ public class RobotContainer {
       () -> PRIMARY_CONTROLLER.getLeftY(),    // drive forward and back
       () -> PRIMARY_CONTROLLER.getRightX()    // drive rotate
     );
-    m_algaeSubsystem.configureBindings(
-      PRIMARY_CONTROLLER.x(),                 // cancel
-      PRIMARY_CONTROLLER.leftBumper(),        // intake algae
-      PRIMARY_CONTROLLER.leftTrigger(),       // shoot algae
-      PRIMARY_CONTROLLER.a(),                 // descore algae
-      PRIMARY_CONTROLLER.back()               // regurgitate
-    );
-    m_climbSubsystem.configureBindings(
-      PRIMARY_CONTROLLER.x(),                 // cancel
-      PRIMARY_CONTROLLER.b()                  // climber management
-    );
+    // m_algaeSubsystem.configureBindings(
+    //   PRIMARY_CONTROLLER.x(),                 // cancel
+    //   PRIMARY_CONTROLLER.leftBumper(),        // intake algae
+    //   PRIMARY_CONTROLLER.leftTrigger(),       // shoot algae
+    //   PRIMARY_CONTROLLER.a(),                 // descore algae
+    //   PRIMARY_CONTROLLER.back()               // regurgitate
+    // );
+    // m_climbSubsystem.configureBindings(
+    //   PRIMARY_CONTROLLER.x(),                 // cancel
+    //   PRIMARY_CONTROLLER.b()                  // climber management
+    // );
     m_coralSubsystem.configureBindings(
       PRIMARY_CONTROLLER.x(),                 // cancel
       PRIMARY_CONTROLLER.rightBumper(),       // intake coral
@@ -75,9 +75,9 @@ public class RobotContainer {
   }
 
   private void zeroRelativeEncoders() {
-    m_algaeSubsystem.zeroRelativeEncoders();
+    // m_algaeSubsystem.zeroRelativeEncoders();
     m_coralSubsystem.zeroRelativeEncoders();
-    m_climbSubsystem.zeroRelativeEncoders();
+    // m_climbSubsystem.zeroRelativeEncoders();
     m_driveSubsystem.zeroGyro();
   }
 }

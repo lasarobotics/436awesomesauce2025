@@ -1,6 +1,6 @@
 package frc.robot.subsystems.drive;
 
-import static edu.wpi.first.units.Units.Meter;
+// import static edu.wpi.first.units.Units.Meter;
 
 import java.io.File;
 import java.io.IOException;
@@ -8,9 +8,10 @@ import java.util.function.DoubleSupplier;
 
 import com.studica.frc.AHRS;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
+// import edu.wpi.first.math.geometry.Pose2d;
+// import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.util.Units;
 // import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 // import edu.wpi.first.math.util.Units;
 import swervelib.SwerveDrive;
@@ -36,22 +37,34 @@ public class SwerveManager {
         //     new Translation2d(Units.inchesToMeters(-12.5), Units.inchesToMeters(-12.5))  // Back Right
         // );
 
+        // 4.71 : 1
+        // base kit high
+        // https://www.revrobotics.com/rev-21-3005/
+        double angleConversionFactor = SwerveMath.calculateDegreesPerSteeringRotation(4.71, 1);
+
+        // 3 inch wheel
+        double driveConversionFactor = SwerveMath.calculateMetersPerRotation(Units.inchesToMeters(3), angleConversionFactor);
+
         // this is yanked straight from the example
         // TODO update this
-        boolean blueAlliance = false;
-        Pose2d startingPose = blueAlliance ? new Pose2d(new Translation2d(Meter.of(1),
-                                                                        Meter.of(4)),
-                                                        Rotation2d.fromDegrees(0))
-                                        : new Pose2d(new Translation2d(Meter.of(16),
-                                                                        Meter.of(4)),
-                                                        Rotation2d.fromDegrees(180));
+        // boolean blueAlliance = false;
+        // Pose2d startingPose = blueAlliance ? new Pose2d(new Translation2d(Meter.of(1),
+        //                                                                 Meter.of(4)),
+        //                                                 Rotation2d.fromDegrees(0))
+        //                                 : new Pose2d(new Translation2d(Meter.of(16),
+        //                                                                 Meter.of(4)),
+        //                                                 Rotation2d.fromDegrees(180));
 
         try {
             swerveDrive = new SwerveParser(directory)
-                .createSwerveDrive(Constants.Swerve.MAX_SPEED, startingPose);
+                .createSwerveDrive(
+                    Constants.Swerve.MAX_SPEED,
+                    angleConversionFactor,
+                    driveConversionFactor);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+        swerveDrive.setHeadingCorrection(false);
     }
 
     public void drive(
@@ -70,8 +83,16 @@ public class SwerveManager {
             false); // make it closed loop
     }
 
+    public void driveSecond(DoubleSupplier translationX, DoubleSupplier translationY, DoubleSupplier angularRotationX) {
+        swerveDrive.drive(new Translation2d(translationX.getAsDouble() * swerveDrive.getMaximumChassisVelocity(),
+                                            translationY.getAsDouble() * swerveDrive.getMaximumChassisVelocity()),
+                            angularRotationX.getAsDouble() * swerveDrive.getMaximumChassisAngularVelocity(),
+                            true,
+                            false);
+    }
+
     public void zeroGyro() {
-        AHRS navx = (AHRS) swerveDrive.getGyro().getIMU();
+        AHRS navx = (AHRS)swerveDrive.getGyro().getIMU();
         navx.zeroYaw();
     }
 }

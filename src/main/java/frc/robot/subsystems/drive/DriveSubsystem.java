@@ -68,7 +68,7 @@ public class DriveSubsystem extends StateMachine implements AutoCloseable {
     }
 
     public void drive() {
-        m_swerveManager.drive(m_leftX, m_leftY, m_rightX);
+        m_swerveManager.driveSecond(m_leftX, m_leftY, m_rightX);
     }
 
     public void zeroGyro() {

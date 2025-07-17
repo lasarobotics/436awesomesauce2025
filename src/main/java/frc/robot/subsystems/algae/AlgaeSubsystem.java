@@ -11,13 +11,17 @@ import org.lasarobotics.fsm.SystemState;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
+import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Dimensionless;
 import edu.wpi.first.wpilibj.DigitalInput;
 
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkBase.ControlType;
+import com.revrobotics.spark.SparkBase.PersistMode;
+import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkClosedLoopController;
+import com.revrobotics.spark.SparkClosedLoopController.ArbFFUnits;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import frc.robot.Constants;
@@ -162,6 +166,8 @@ public class AlgaeSubsystem extends StateMachine implements AutoCloseable {
     private final SparkClosedLoopController m_armController;
     private final RelativeEncoder m_armEncoder;
     private final SparkMaxConfig m_armMotorConfig;
+    private final SparkMaxConfig m_intakeMotorConfig;
+    private final SparkMaxConfig m_shooterMotorConfig;
     private BooleanSupplier m_cancelButton;
     private BooleanSupplier m_intakeAlgaeButton;
     private BooleanSupplier m_shootAlgaeButton;
@@ -193,6 +199,22 @@ public class AlgaeSubsystem extends StateMachine implements AutoCloseable {
             .d(Constants.AlgaeArmPID.D);
         this.m_armController = this.m_armMotor.getClosedLoopController();
         this.m_armEncoder = this.m_armMotor.getEncoder();
+        m_armMotorConfig.smartCurrentLimit((int)Constants.AlgaeHardware.ARM_MOTOR_CURRENT_LIMIT.in(Units.Amps));
+        m_armMotor.configure(m_armMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
+
+        m_intakeMotorConfig = new SparkMaxConfig();
+        m_intakeMotorConfig.closedLoop.maxMotion
+            .maxAcceleration(750, ClosedLoopSlot.kSlot1)
+            .maxVelocity(750, ClosedLoopSlot.kSlot1);
+        m_intakeMotorConfig.smartCurrentLimit((int)Constants.AlgaeHardware.INTAKE_MOTOR_CURRENT_LIMIT.in(Units.Amps));
+        m_intakeMotor.configure(m_intakeMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
+
+        m_shooterMotorConfig = new SparkMaxConfig();
+        m_shooterMotorConfig.closedLoop.maxMotion
+            .maxAcceleration(750, ClosedLoopSlot.kSlot2)
+            .maxVelocity(750, ClosedLoopSlot.kSlot2);
+        m_shooterMotorConfig.smartCurrentLimit((int)Constants.AlgaeHardware.SHOOTER_MOTOR_CURRENT_LIMIT.in(Units.Amps));
+        m_shooterMotor.configure(m_shooterMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
     }
 
     public static Hardware initializeHardware() {
@@ -231,12 +253,12 @@ public class AlgaeSubsystem extends StateMachine implements AutoCloseable {
         m_shooterMotor.stopMotor();
     }
 
-    public void setShooterMotorSpeed(Dimensionless speed) {
-        m_shooterMotor.set(speed.in(Value));
+    public void setIntakeMotorSpeed(Dimensionless speed) {
+        m_shooterMotor.getClosedLoopController().setReference(speed.in(Value), ControlType.kDutyCycle, ClosedLoopSlot.kSlot1, 0.0, ArbFFUnits.kVoltage);
     }
 
-    public void setIntakeMotorSpeed(Dimensionless speed) {
-        m_intakeMotor.set(speed.in(Value));
+    public void setShooterMotorSpeed(Dimensionless speed) {
+        m_shooterMotor.getClosedLoopController().setReference(speed.in(Value), ControlType.kDutyCycle, ClosedLoopSlot.kSlot2, 0.0, ArbFFUnits.kVoltage);
     }
 
     public void sendArmToSetpoint(double setpoint) {

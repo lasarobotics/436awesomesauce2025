@@ -17,11 +17,9 @@ import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkClosedLoopController.ArbFFUnits;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.units.Units;
-import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Dimensionless;
 import frc.robot.Constants;
 
@@ -123,7 +121,6 @@ public class CoralSubsystem extends StateMachine implements AutoCloseable {
     private static CoralSubsystem s_coralSubsystemInstance;
     private final SparkMax m_coralMotor;
     private final SparkMaxConfig m_coralMotorConfig;
-    private final Current ROLLER_MOTOR_CURRENT_LIMIT = Units.Amps.of(20); // TODO put in Constants
     private final SparkMax m_armMotor;
     private final SparkClosedLoopController m_armController;
     private final RelativeEncoder m_armEncoder;
@@ -156,13 +153,14 @@ public class CoralSubsystem extends StateMachine implements AutoCloseable {
             .d(Constants.CoralArmPID.D);
         this.m_armController = this.m_armMotor.getClosedLoopController();
         this.m_armEncoder = this.m_armMotor.getEncoder();
+        m_armMotorConfig.smartCurrentLimit((int)Constants.CoralArmHardware.ARM_MOTOR_CURRENT_LIMIT.in(Units.Amps));
+        m_armMotor.configure(m_armMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
 
         m_coralMotorConfig = new SparkMaxConfig();
-        m_coralMotorConfig.closedLoop.maxMotion.maxVelocity(750);
-        m_coralMotorConfig.closedLoop.maxMotion.maxAcceleration(750);
-
-        m_coralMotorConfig.smartCurrentLimit((int)ROLLER_MOTOR_CURRENT_LIMIT.in(Units.Amps));
-
+        m_coralMotorConfig.closedLoop.maxMotion
+            .maxAcceleration(750)
+            .maxVelocity(750);
+        m_coralMotorConfig.smartCurrentLimit((int)Constants.CoralArmHardware.ROLLER_MOTOR_CURRENT_LIMIT.in(Units.Amps));
         m_coralMotor.configure(m_coralMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
     }
 
@@ -195,7 +193,6 @@ public class CoralSubsystem extends StateMachine implements AutoCloseable {
     }
 
     public void setMotorToSpeed(Dimensionless speed) {
-        // m_coralMotor.set(speed.in(Value), ControlType.kDutyCycle);
         m_coralMotor.getClosedLoopController().setReference(speed.in(Value), ControlType.kDutyCycle, ClosedLoopSlot.kSlot0, 0.0, ArbFFUnits.kVoltage);
     }
 

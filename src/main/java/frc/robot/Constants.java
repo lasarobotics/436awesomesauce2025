@@ -70,7 +70,8 @@ public final class Constants {
   }
 
   public static class ClimbHardware {
-    public static final int ARM_MOTOR_ID = 61;
+    public static final int CLIMB_MOTOR_ID = 61;
+    public static final Current CLIMB_MOTOR_CURRENT_LIMIT = Units.Amps.of(20); // TODO check
   }
 
   public static class ClimbMotorSetpoints {

@@ -13,6 +13,7 @@ import com.studica.frc.AHRS;
 // import edu.wpi.first.math.geometry.Pose2d;
 // import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 // import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 // import edu.wpi.first.math.util.Units;
@@ -87,11 +88,13 @@ public class SwerveManager {
 
     public void driveSecond(DoubleSupplier translationX, DoubleSupplier translationY, DoubleSupplier angularRotationX) {
         Logger.recordOutput("SwerveManager/Inputs/LeftX", translationX.getAsDouble());
-        swerveDrive.drive(new Translation2d(translationX.getAsDouble() * swerveDrive.getMaximumChassisVelocity(),
-                                            translationY.getAsDouble() * swerveDrive.getMaximumChassisVelocity()),
-                            angularRotationX.getAsDouble() * swerveDrive.getMaximumChassisAngularVelocity(),
-                            true,
-                            false);
+        swerveDrive.driveFieldOriented(new ChassisSpeeds(translationX.getAsDouble() * swerveDrive.getMaximumChassisVelocity(),
+        translationY.getAsDouble() * swerveDrive.getMaximumChassisVelocity(), angularRotationX.getAsDouble() * swerveDrive.getMaximumChassisAngularVelocity()));
+        // swerveDrive.drive(new Translation2d(translationX.getAsDouble() * swerveDrive.getMaximumChassisVelocity(),
+        //                                     translationY.getAsDouble() * swerveDrive.getMaximumChassisVelocity()),
+        //                     angularRotationX.getAsDouble() * swerveDrive.getMaximumChassisAngularVelocity(),
+        //                     true,
+        //                     false);
     }
 
     public void zeroGyro() {

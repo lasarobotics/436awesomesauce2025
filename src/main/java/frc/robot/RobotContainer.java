@@ -22,15 +22,15 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
  * subsystems, commands, and trigger mappings) should be declared here.
  */
 public class RobotContainer {
+  // Replace with CommandPS4Controller or CommandJoystick if needed
+  private final CommandXboxController PRIMARY_CONTROLLER =
+      new CommandXboxController(OperatorConstants.kDriverControllerPort);
   // The robot's subsystems and commands are defined here...
   private final CoralSubsystem m_coralSubsystem = CoralSubsystem.getInstance();
   // private final AlgaeSubsystem m_algaeSubsystem = AlgaeSubsystem.getInstance();
   // private final ClimbSubsystem m_climbSubsystem = ClimbSubsystem.getInstance();
   private final DriveSubsystem m_driveSubsystem = DriveSubsystem.getInstance();
 
-  // Replace with CommandPS4Controller or CommandJoystick if needed
-  private final CommandXboxController PRIMARY_CONTROLLER =
-      new CommandXboxController(OperatorConstants.kDriverControllerPort);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {

@@ -54,7 +54,7 @@ public class DriveSubsystem extends StateMachine implements AutoCloseable {
 
     public DriveSubsystem(
             File directory) {
-        super(DriveSubsystemStates.AUTO);
+        super(DriveSubsystemStates.TELEOP);
 
         m_swerveManager = new SwerveManager(directory);
     }

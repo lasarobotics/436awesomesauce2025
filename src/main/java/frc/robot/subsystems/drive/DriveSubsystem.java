@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.function.DoubleSupplier;
 
 import org.lasarobotics.fsm.SystemState;
+import org.littletonrobotics.junction.Logger;
 import org.lasarobotics.fsm.StateMachine;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
@@ -68,6 +69,7 @@ public class DriveSubsystem extends StateMachine implements AutoCloseable {
     }
 
     public void drive() {
+        Logger.recordOutput("DriveSubsystem/Inputs/LeftX", m_leftX.getAsDouble());
         m_swerveManager.driveSecond(m_leftX, m_leftY, m_rightX);
     }
 

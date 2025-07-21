@@ -6,6 +6,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.function.DoubleSupplier;
 
+import org.littletonrobotics.junction.Logger;
+
 import com.studica.frc.AHRS;
 
 // import edu.wpi.first.math.geometry.Pose2d;
@@ -84,6 +86,7 @@ public class SwerveManager {
     }
 
     public void driveSecond(DoubleSupplier translationX, DoubleSupplier translationY, DoubleSupplier angularRotationX) {
+        Logger.recordOutput("SwerveManager/Inputs/LeftX", translationX.getAsDouble());
         swerveDrive.drive(new Translation2d(translationX.getAsDouble() * swerveDrive.getMaximumChassisVelocity(),
                                             translationY.getAsDouble() * swerveDrive.getMaximumChassisVelocity()),
                             angularRotationX.getAsDouble() * swerveDrive.getMaximumChassisAngularVelocity(),

@@ -9,6 +9,9 @@ import frc.robot.subsystems.coral.CoralSubsystem;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.algae.AlgaeSubsystem;
 import frc.robot.subsystems.climb.ClimbSubsystem;
+
+import org.littletonrobotics.junction.Logger;
+
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
@@ -51,7 +54,11 @@ public class RobotContainer {
     // Schedule `exampleMethodCommand` when the Xbox controller's B button is pressed,
     // cancelling on release.
     m_driveSubsystem.configureBindings(
-      () -> PRIMARY_CONTROLLER.getLeftX(),    // drive left and right
+      () -> {
+        double leftX = PRIMARY_CONTROLLER.getLeftX();
+        Logger.recordOutput("RobotContainer/Inputs/LeftX", leftX);
+        return leftX;
+      },    // drive left and right
       () -> PRIMARY_CONTROLLER.getLeftY(),    // drive forward and back
       () -> PRIMARY_CONTROLLER.getRightX()    // drive rotate
     );

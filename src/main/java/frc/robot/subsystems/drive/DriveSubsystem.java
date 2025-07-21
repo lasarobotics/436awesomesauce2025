@@ -1,15 +1,28 @@
 package frc.robot.subsystems.drive;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.function.DoubleSupplier;
 
 import org.lasarobotics.fsm.SystemState;
 import org.littletonrobotics.junction.Logger;
+
+import com.studica.frc.AHRS;
+
 import org.lasarobotics.fsm.StateMachine;
+
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
+import frc.robot.Constants;
+import swervelib.SwerveDrive;
+import swervelib.math.SwerveMath;
+import swervelib.parser.SwerveParser;
 
 public class DriveSubsystem extends StateMachine implements AutoCloseable {
+
+    private final SwerveDrive swerveDrive;
 
     public enum DriveSubsystemStates implements SystemState {
         NOTHING {
@@ -40,7 +53,7 @@ public class DriveSubsystem extends StateMachine implements AutoCloseable {
     }
 
     private static DriveSubsystem s_driveSubsystemInstance;
-    private SwerveManager m_swerveManager;
+    // private SwerveManager m_swerveManager;
     private DoubleSupplier m_leftX;
     private DoubleSupplier m_leftY;
     private DoubleSupplier m_rightX;
@@ -56,7 +69,27 @@ public class DriveSubsystem extends StateMachine implements AutoCloseable {
             File directory) {
         super(DriveSubsystemStates.TELEOP);
 
-        m_swerveManager = new SwerveManager(directory);
+
+
+        // 4.71 : 1
+        // base kit high
+        // https://www.revrobotics.com/rev-21-3005/
+        double angleConversionFactor = SwerveMath.calculateDegreesPerSteeringRotation(4.71, 1);
+
+        // 3 inch wheel
+        double driveConversionFactor = SwerveMath.calculateMetersPerRotation(Units.inchesToMeters(3), angleConversionFactor);
+
+        try {
+            swerveDrive = new SwerveParser(directory)
+                .createSwerveDrive(
+                    Constants.Swerve.MAX_SPEED,
+                    angleConversionFactor,
+                    driveConversionFactor);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        swerveDrive.setHeadingCorrection(false);
+        // m_swerveManager = new SwerveManager(directory);
     }
 
     public void configureBindings(
@@ -70,11 +103,22 @@ public class DriveSubsystem extends StateMachine implements AutoCloseable {
 
     public void drive() {
         Logger.recordOutput("DriveSubsystem/Inputs/LeftX", m_leftX.getAsDouble());
-        m_swerveManager.driveSecond(m_leftX, m_leftY, m_rightX);
+        // m_swerveManager.driveSecond(m_leftX, m_leftY, m_rightX);
+
+        swerveDrive.driveFieldOriented(
+            new ChassisSpeeds(
+                m_leftX.getAsDouble() * swerveDrive.getMaximumChassisVelocity(),
+                m_leftY.getAsDouble() * swerveDrive.getMaximumChassisVelocity(),
+                m_rightX.getAsDouble() * swerveDrive.getMaximumChassisAngularVelocity()
+            )
+        );
     }
 
     public void zeroGyro() {
-        m_swerveManager.zeroGyro();
+        // m_swerveManager.zeroGyro();
+
+        AHRS navx = (AHRS)swerveDrive.getGyro().getIMU();
+        navx.zeroYaw();
     }
 
     public void close() {}

@@ -88,8 +88,13 @@ public class SwerveManager {
 
     public void driveSecond(DoubleSupplier translationX, DoubleSupplier translationY, DoubleSupplier angularRotationX) {
         Logger.recordOutput("SwerveManager/Inputs/LeftX", translationX.getAsDouble());
-        swerveDrive.driveFieldOriented(new ChassisSpeeds(translationX.getAsDouble() * swerveDrive.getMaximumChassisVelocity(),
-        translationY.getAsDouble() * swerveDrive.getMaximumChassisVelocity(), angularRotationX.getAsDouble() * swerveDrive.getMaximumChassisAngularVelocity()));
+        swerveDrive.driveFieldOriented(
+            new ChassisSpeeds(
+                translationX.getAsDouble() * swerveDrive.getMaximumChassisVelocity(),
+                translationY.getAsDouble() * swerveDrive.getMaximumChassisVelocity(),
+                angularRotationX.getAsDouble() * swerveDrive.getMaximumChassisAngularVelocity()
+            )
+        );
         // swerveDrive.drive(new Translation2d(translationX.getAsDouble() * swerveDrive.getMaximumChassisVelocity(),
         //                                     translationY.getAsDouble() * swerveDrive.getMaximumChassisVelocity()),
         //                     angularRotationX.getAsDouble() * swerveDrive.getMaximumChassisAngularVelocity(),

@@ -12,6 +12,7 @@ import frc.robot.subsystems.climb.ClimbSubsystem;
 
 import org.littletonrobotics.junction.Logger;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
@@ -57,10 +58,18 @@ public class RobotContainer {
       () -> {
         double leftX = PRIMARY_CONTROLLER.getLeftX();
         Logger.recordOutput("RobotContainer/Inputs/LeftX", leftX);
-        return leftX;
+        return MathUtil.applyDeadband(leftX, Constants.Swerve.DEADBAND);
       },    // drive left and right
-      () -> PRIMARY_CONTROLLER.getLeftY(),    // drive forward and back
-      () -> PRIMARY_CONTROLLER.getRightX()    // drive rotate
+      () -> {
+        double leftY = PRIMARY_CONTROLLER.getLeftY();
+        Logger.recordOutput("RobotContainer/Inputs/LeftY", leftY);
+        return MathUtil.applyDeadband(leftY, Constants.Swerve.DEADBAND);
+      },    // drive forward and back
+      () -> {
+        double rightX = PRIMARY_CONTROLLER.getRightX();
+        Logger.recordOutput("RobotContainer/Inputs/RightX", rightX);
+        return MathUtil.applyDeadband(rightX, Constants.Swerve.DEADBAND);
+      }    // drive rotate
     );
     // m_algaeSubsystem.configureBindings(
     //   PRIMARY_CONTROLLER.x(),                 // cancel

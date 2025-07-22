@@ -11,6 +11,7 @@ import com.studica.frc.AHRS;
 
 import org.lasarobotics.fsm.StateMachine;
 
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -103,12 +104,14 @@ public class DriveSubsystem extends StateMachine implements AutoCloseable {
 
     public void drive() {
         Logger.recordOutput("DriveSubsystem/Inputs/LeftX", m_leftX.getAsDouble());
+        Logger.recordOutput("DriveSubsystem/Inputs/LeftY", m_leftY.getAsDouble());
+        Logger.recordOutput("DriveSubsystem/Inputs/RightX", m_rightX.getAsDouble());
         // m_swerveManager.driveSecond(m_leftX, m_leftY, m_rightX);
-
+        
         swerveDrive.driveFieldOriented(
             new ChassisSpeeds(
-                m_leftX.getAsDouble() * swerveDrive.getMaximumChassisVelocity(),
-                m_leftY.getAsDouble() * swerveDrive.getMaximumChassisVelocity(),
+                m_leftX.getAsDouble() * swerveDrive.getMaximumChassisVelocity() * Constants.Swerve.TRANSLATION_SCALE,
+                m_leftY.getAsDouble() * swerveDrive.getMaximumChassisVelocity() * Constants.Swerve.TRANSLATION_SCALE,
                 m_rightX.getAsDouble() * swerveDrive.getMaximumChassisAngularVelocity()
             )
         );

@@ -80,6 +80,8 @@ public final class Constants {
   }
 
   public static class Swerve {
-    public static final double MAX_SPEED = 0.0; // TODO make this not zero
+    public static final double MAX_SPEED = 4.4196; // 14.5 feet to meters
+    public static final double DEADBAND = 0.1;
+    public static final double TRANSLATION_SCALE = 0.8;
   }
 }

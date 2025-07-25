@@ -29,8 +29,8 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final CoralSubsystem m_coralSubsystem = CoralSubsystem.getInstance();
   // private final AlgaeSubsystem m_algaeSubsystem = AlgaeSubsystem.getInstance();
-  // private final ClimbSubsystem m_climbSubsystem = ClimbSubsystem.getInstance();
-  private final DriveSubsystem m_driveSubsystem = DriveSubsystem.getInstance();
+  // private final ClimbSubsystem m_climbSubsystem = ClimbSubsystem.getInstance();  
+  public final DriveSubsystem m_driveSubsystem = DriveSubsystem.getInstance();
 
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
@@ -69,7 +69,8 @@ public class RobotContainer {
         double rightX = PRIMARY_CONTROLLER.getRightX();
         Logger.recordOutput("RobotContainer/Inputs/RightX", rightX);
         return MathUtil.applyDeadband(rightX, Constants.Swerve.DEADBAND);
-      }    // drive rotate
+      },    // drive rotate
+      PRIMARY_CONTROLLER.start()
     );
     // m_algaeSubsystem.configureBindings(
     //   PRIMARY_CONTROLLER.x(),                 // cancel

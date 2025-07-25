@@ -2,6 +2,7 @@ package frc.robot.subsystems.drive;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
 import org.lasarobotics.fsm.SystemState;
@@ -17,13 +18,10 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import frc.robot.Constants;
-import swervelib.SwerveDrive;
-import swervelib.math.SwerveMath;
-import swervelib.parser.SwerveParser;
 
 public class DriveSubsystem extends StateMachine implements AutoCloseable {
 
-    private final SwerveDrive swerveDrive;
+    private final MAXSwerve swerveDrive;
 
     public enum DriveSubsystemStates implements SystemState {
         NOTHING {
@@ -58,6 +56,7 @@ public class DriveSubsystem extends StateMachine implements AutoCloseable {
     private DoubleSupplier m_leftX;
     private DoubleSupplier m_leftY;
     private DoubleSupplier m_rightX;
+    private BooleanSupplier m_reset;
 
     public static DriveSubsystem getInstance() {
         if (s_driveSubsystemInstance == null) {
@@ -69,37 +68,19 @@ public class DriveSubsystem extends StateMachine implements AutoCloseable {
     public DriveSubsystem(
             File directory) {
         super(DriveSubsystemStates.TELEOP);
-
-
-
-        // 4.71 : 1
-        // base kit high
-        // https://www.revrobotics.com/rev-21-3005/
-        double angleConversionFactor = SwerveMath.calculateDegreesPerSteeringRotation(4.71, 1);
-
-        // 3 inch wheel
-        double driveConversionFactor = SwerveMath.calculateMetersPerRotation(Units.inchesToMeters(3), angleConversionFactor);
-
-        try {
-            swerveDrive = new SwerveParser(directory)
-                .createSwerveDrive(
-                    Constants.Swerve.MAX_SPEED,
-                    angleConversionFactor,
-                    driveConversionFactor);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        swerveDrive.setHeadingCorrection(false);
+        swerveDrive = new MAXSwerve();
         // m_swerveManager = new SwerveManager(directory);
     }
 
     public void configureBindings(
             DoubleSupplier leftX,
             DoubleSupplier leftY,
-            DoubleSupplier rightX) {
+            DoubleSupplier rightX,
+            BooleanSupplier reset) {
         m_leftX = leftX;
         m_leftY = leftY;
         m_rightX = rightX;
+        m_reset = reset;
     }
 
     public void drive() {
@@ -108,20 +89,26 @@ public class DriveSubsystem extends StateMachine implements AutoCloseable {
         Logger.recordOutput("DriveSubsystem/Inputs/RightX", m_rightX.getAsDouble());
         // m_swerveManager.driveSecond(m_leftX, m_leftY, m_rightX);
         
-        swerveDrive.driveFieldOriented(
-            new ChassisSpeeds(
-                m_leftX.getAsDouble() * swerveDrive.getMaximumChassisVelocity() * Constants.Swerve.TRANSLATION_SCALE,
-                m_leftY.getAsDouble() * swerveDrive.getMaximumChassisVelocity() * Constants.Swerve.TRANSLATION_SCALE,
-                m_rightX.getAsDouble() * swerveDrive.getMaximumChassisAngularVelocity()
-            )
+        swerveDrive.drive(
+            m_leftX.getAsDouble() * Constants.DriveConstants.kMaxSpeedMetersPerSecond * Constants.Swerve.TRANSLATION_SCALE,
+            m_leftY.getAsDouble() * Constants.DriveConstants.kMaxSpeedMetersPerSecond * Constants.Swerve.TRANSLATION_SCALE,
+            m_rightX.getAsDouble() * Constants.DriveConstants.kMaxAngularSpeed,
+            true
         );
+    }
+
+    public void periodic() {
+        if (m_reset.getAsBoolean())
+            zeroGyro();
+        swerveDrive.periodic();
+        Logger.recordOutput("DriveSubsystem/pose", swerveDrive.getPose());
+        Logger.recordOutput("DriveSubsystem/heading", swerveDrive.getHeading());
     }
 
     public void zeroGyro() {
         // m_swerveManager.zeroGyro();
 
-        AHRS navx = (AHRS)swerveDrive.getGyro().getIMU();
-        navx.zeroYaw();
+        swerveDrive.zeroHeading();
     }
 
     public void close() {}

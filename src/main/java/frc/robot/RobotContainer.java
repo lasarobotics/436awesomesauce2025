@@ -58,17 +58,17 @@ public class RobotContainer {
       () -> {
         double leftX = PRIMARY_CONTROLLER.getLeftX();
         Logger.recordOutput("RobotContainer/Inputs/LeftX", leftX);
-        return MathUtil.applyDeadband(leftX, Constants.Swerve.DEADBAND);
+        return MathUtil.applyDeadband(-leftX, Constants.Swerve.DEADBAND);
       },    // drive left and right
       () -> {
         double leftY = PRIMARY_CONTROLLER.getLeftY();
         Logger.recordOutput("RobotContainer/Inputs/LeftY", leftY);
-        return MathUtil.applyDeadband(leftY, Constants.Swerve.DEADBAND);
+        return MathUtil.applyDeadband(-leftY, Constants.Swerve.DEADBAND);
       },    // drive forward and back
       () -> {
         double rightX = PRIMARY_CONTROLLER.getRightX();
         Logger.recordOutput("RobotContainer/Inputs/RightX", rightX);
-        return MathUtil.applyDeadband(rightX, Constants.Swerve.DEADBAND);
+        return MathUtil.applyDeadband(-rightX, Constants.Swerve.DEADBAND);
       },    // drive rotate
       PRIMARY_CONTROLLER.start()
     );

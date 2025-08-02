@@ -90,9 +90,9 @@ public class DriveSubsystem extends StateMachine implements AutoCloseable {
         // m_swerveManager.driveSecond(m_leftX, m_leftY, m_rightX);
         
         swerveDrive.drive(
-            m_leftX.getAsDouble() * Constants.DriveConstants.kMaxSpeedMetersPerSecond * Constants.Swerve.TRANSLATION_SCALE,
-            m_leftY.getAsDouble() * Constants.DriveConstants.kMaxSpeedMetersPerSecond * Constants.Swerve.TRANSLATION_SCALE,
-            m_rightX.getAsDouble() * Constants.DriveConstants.kMaxAngularSpeed,
+            m_leftX.getAsDouble() * Constants.Swerve.GIMP_SCALE * Constants.DriveConstants.kMaxSpeedMetersPerSecond * Constants.Swerve.TRANSLATION_SCALE,
+            m_leftY.getAsDouble() * Constants.Swerve.GIMP_SCALE * Constants.DriveConstants.kMaxSpeedMetersPerSecond * Constants.Swerve.TRANSLATION_SCALE,
+            m_rightX.getAsDouble() * Constants.Swerve.GIMP_SCALE * Constants.DriveConstants.kMaxAngularSpeed,
             true
         );
     }

@@ -85,6 +85,7 @@ public final class Constants {
     public static final double MAX_SPEED = 4.4196; // 14.5 feet to meters
     public static final double DEADBAND = 0.1;
     public static final double TRANSLATION_SCALE = 0.8;
+    public static final double GIMP_SCALE = 0.05;
   }
   public static final class DriveConstants {
     // Driving Parameters - Note that these are not the maximum capable speeds of

@@ -31,7 +31,7 @@ public class CoralSubsystem extends StateMachine implements AutoCloseable {
         SparkMax armMotor
     ) {}
 
-    static final Dimensionless INTAKE_MOTOR_SPEED = Percent.of(100); // TODO might need to change these
+    static final Dimensionless INTAKE_MOTOR_SPEED = Percent.of(100);
     static final Dimensionless SCORE_MOTOR_SPEED = Percent.of(-100);
     static final Dimensionless ARM_RETRACT_SPEED = Percent.of(5); // todo check this
 
@@ -53,7 +53,8 @@ public class CoralSubsystem extends StateMachine implements AutoCloseable {
             @Override
             public void execute() {
                 if (Units.Amps.of(getInstance().m_armMotor.getOutputCurrent()).gte(Constants.CoralArmHardware.ARM_STALL_CURRENT)) {
-                    // do stuff
+                    getInstance().zeroRelativeEncoders();
+                    getInstance().m_armMotor.stopMotor();
                 }
             }
 
@@ -84,6 +85,8 @@ public class CoralSubsystem extends StateMachine implements AutoCloseable {
                 if (getInstance().m_cancelButton.getAsBoolean()) return REST;
                 if (getInstance().m_scoreCoralButton.getAsBoolean()) return SCORE;
                 if (getInstance().m_regurgitateButton.getAsBoolean()) return REGURGITATE;
+
+                if (getInstance().intakeIsStalled()) return REST;
 
                 return this;
             }
@@ -204,6 +207,10 @@ public class CoralSubsystem extends StateMachine implements AutoCloseable {
 
     public void setMotorToSpeed(Dimensionless speed) {
         m_coralMotor.getClosedLoopController().setReference(speed.in(Value), ControlType.kDutyCycle, ClosedLoopSlot.kSlot0, 0.0, ArbFFUnits.kVoltage);
+    }
+
+    public boolean intakeIsStalled() {
+        return Units.Amps.of(getInstance().m_coralMotor.getOutputCurrent()).gte(Constants.CoralArmHardware.ROLLER_STALL_CURRENT);
     }
 
     public void sendArmToSetpoint(double setpoint) {

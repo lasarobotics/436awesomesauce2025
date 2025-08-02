@@ -27,21 +27,20 @@ public final class Constants {
   public static class CoralArmHardware {
     public static final int ARM_MOTOR_ID = 52;
     public static final int EFFECTOR_MOTOR_ID = 51;
-    public static final double MAX_ARM_VELOCIY = 0.0; // measured in rpm TODO
-    public static final double MAX_ARM_ACCELERATION = 0.0; // measured in rpm per second TODO
     public static final double ALLOWED_CLOSED_LOOP_ERROR = 0.0; // measured in rotations TODO
     public static final Current ARM_MOTOR_CURRENT_LIMIT = Units.Amps.of(20); // TODO check
     public static final Current ROLLER_MOTOR_CURRENT_LIMIT = Units.Amps.of(20);
+    public static final Current ARM_STALL_CURRENT = Units.Amps.of(20);
   }
 
   public static class CoralArmSetpoints {
     public static final double STOW = 0.0; // TODO figure these out
     public static final double SCORE = 0.0;
-    public static final double INTAKE = 0.0;
+    public static final double INTAKE = -15.0;
   }
 
   public static class CoralArmPID {
-    public static final double P = 0.0; // TODO figure these out
+    public static final double P = 0.15;
     public static final double I = 0.0;
     public static final double D = 0.0;
   }

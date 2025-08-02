@@ -18,6 +18,7 @@ import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkClosedLoopController.ArbFFUnits;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkMaxConfig;
+import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Dimensionless;
@@ -31,8 +32,8 @@ public class CoralSubsystem extends StateMachine implements AutoCloseable {
     ) {}
 
     static final Dimensionless INTAKE_MOTOR_SPEED = Percent.of(100); // TODO might need to change these
-    static final Dimensionless SCORE_MOTOR_SPEED = Percent.of(-200);
-    static final Dimensionless MOTOR_SPEED = Percent.of(10);
+    static final Dimensionless SCORE_MOTOR_SPEED = Percent.of(-100);
+    static final Dimensionless ARM_RETRACT_SPEED = Percent.of(5); // todo check this
 
     public enum CoralSubsystemStates implements SystemState {
         NOTHING {
@@ -45,7 +46,15 @@ public class CoralSubsystem extends StateMachine implements AutoCloseable {
             @Override
             public void initialize() {
                 getInstance().stopMotor();
-                getInstance().sendArmToSetpoint(Constants.CoralArmSetpoints.STOW);
+                // getInstance().sendArmToSetpoint(Constants.CoralArmSetpoints.STOW);
+                getInstance().setArmToGoBack();
+            }
+
+            @Override
+            public void execute() {
+                if (Units.Amps.of(getInstance().m_armMotor.getOutputCurrent()).gte(Constants.CoralArmHardware.ARM_STALL_CURRENT)) {
+                    // do stuff
+                }
             }
 
             @Override
@@ -139,22 +148,21 @@ public class CoralSubsystem extends StateMachine implements AutoCloseable {
 
     public CoralSubsystem(Hardware hardware) {
         super(CoralSubsystemStates.REST);
-        this.m_coralMotor = hardware.coralMotor;
-        this.m_armMotor = hardware.armMotor;
+        m_coralMotor = hardware.coralMotor;
+        m_armMotor = hardware.armMotor;
 
         m_armMotorConfig = new SparkMaxConfig();
-        this.m_armMotorConfig.closedLoop.maxMotion
-            .maxAcceleration(Constants.CoralArmHardware.MAX_ARM_ACCELERATION)
-            .maxVelocity(Constants.CoralArmHardware.MAX_ARM_VELOCIY)
+        m_armMotorConfig.closedLoop.maxMotion
             .allowedClosedLoopError(Constants.CoralArmHardware.ALLOWED_CLOSED_LOOP_ERROR);
-        this.m_armMotorConfig.closedLoop
-            .p(Constants.CoralArmPID.P)
-            .i(Constants.CoralArmPID.I)
-            .d(Constants.CoralArmPID.D);
-        this.m_armController = this.m_armMotor.getClosedLoopController();
-        this.m_armEncoder = this.m_armMotor.getEncoder();
+        m_armMotorConfig.closedLoop
+            .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
+            .pid(Constants.CoralArmPID.P,
+                 Constants.CoralArmPID.I,
+                 Constants.CoralArmPID.D);
+        m_armController = m_armMotor.getClosedLoopController();
+        m_armEncoder = m_armMotor.getEncoder();
         m_armMotorConfig.smartCurrentLimit((int)Constants.CoralArmHardware.ARM_MOTOR_CURRENT_LIMIT.in(Units.Amps));
-        m_armMotor.configure(m_armMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
+        m_armMotor.configure(m_armMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
         m_coralMotorConfig = new SparkMaxConfig();
         m_coralMotorConfig.closedLoop.maxMotion
@@ -202,6 +210,11 @@ public class CoralSubsystem extends StateMachine implements AutoCloseable {
             ControlType.kMAXMotionPositionControl,
             ClosedLoopSlot.kSlot0
         );
+    }
+
+    public void setArmToGoBack() {
+        // CCW is positive
+        m_armMotor.set(ARM_RETRACT_SPEED.in(Value));
     }
 
     public boolean isArmAtSetpoint(double setpoint) {

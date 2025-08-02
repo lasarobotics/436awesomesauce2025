@@ -27,7 +27,7 @@ public final class Constants {
   public static class CoralArmHardware {
     public static final int ARM_MOTOR_ID = 52;
     public static final int EFFECTOR_MOTOR_ID = 51;
-    public static final double ALLOWED_CLOSED_LOOP_ERROR = 0.0; // measured in rotations TODO
+    public static final double ALLOWED_CLOSED_LOOP_ERROR = 0.05;
     public static final Current ARM_MOTOR_CURRENT_LIMIT = Units.Amps.of(20); // TODO check
     public static final Current ROLLER_MOTOR_CURRENT_LIMIT = Units.Amps.of(20);
     public static final Current ARM_STALL_CURRENT = Units.Amps.of(20);
@@ -45,39 +45,21 @@ public final class Constants {
     public static final double D = 0.0;
   }
 
-  public static class AlgaeHardware {
-    public static final int INTAKE_MOTOR_ID = 0; // TODO: find these ids
-    public static final int ARM_MOTOR_ID = 0;
-    public static final int SHOOTER_MOTOR_ID = 0;
-    public static final int BEAM_BREAK_ID = 0;
-    public static final double MAX_ARM_VELOCIY = 0.0; // measured in rpm TODO
-    public static final double MAX_ARM_ACCELERATION = 0.0; // measured in rpm per second TODO
-    public static final double ALLOWED_CLOSED_LOOP_ERROR = 0.0; // measured in rotations TODO
-    public static final Current INTAKE_MOTOR_CURRENT_LIMIT= Units.Amps.of(20);
-    public static final Current ARM_MOTOR_CURRENT_LIMIT = Units.Amps.of(20);
-    public static final Current SHOOTER_MOTOR_CURRENT_LIMIT= Units.Amps.of(20);
-  }
-
-  public static class AlgaeArmSetpoints {
-    public static final double STOW = 0.0; // TODO figure these out
-    public static final double DESCORE = 0.0;
-    public static final double INTAKE = 0.0;
-  }
-
-  public static class AlgaeArmPID {
-    public static final double P = 0.0; // TODO figure these out
-    public static final double I = 0.0;
-    public static final double D = 0.0;
-  }
-
   public static class ClimbHardware {
     public static final int CLIMB_MOTOR_ID = 61;
-    public static final Current CLIMB_MOTOR_CURRENT_LIMIT = Units.Amps.of(20); // TODO check
+    public static final Current CLIMB_MOTOR_CURRENT_LIMIT = Units.Amps.of(20);
+    public static final double ALLOWED_CLOSED_LOOP_ERROR = 0.05;
   }
 
   public static class ClimbMotorSetpoints {
     public static final double EXTEND = 0.0; // TODO figure these out
     public static final double RETRACT = 0.0;
+  }
+  
+  public static class ClimbPID {
+    public static final double P = 0.15;  // TODO verify these
+    public static final double I = 0.0;
+    public static final double D = 0.0;
   }
 
   public static class Swerve {
@@ -86,6 +68,7 @@ public final class Constants {
     public static final double TRANSLATION_SCALE = 0.8;
     public static final double GIMP_SCALE = 0.05;
   }
+
   public static final class DriveConstants {
     // Driving Parameters - Note that these are not the maximum capable speeds of
     // the robot, rather the allowed maximum speeds

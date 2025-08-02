@@ -152,13 +152,15 @@ public class CoralSubsystem extends StateMachine implements AutoCloseable {
         m_armMotor = hardware.armMotor;
 
         m_armMotorConfig = new SparkMaxConfig();
-        m_armMotorConfig.closedLoop.maxMotion
-            .allowedClosedLoopError(Constants.CoralArmHardware.ALLOWED_CLOSED_LOOP_ERROR);
         m_armMotorConfig.closedLoop
             .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
             .pid(Constants.CoralArmPID.P,
                  Constants.CoralArmPID.I,
-                 Constants.CoralArmPID.D);
+                 Constants.CoralArmPID.D)
+            .maxMotion
+                .allowedClosedLoopError(
+                    Constants.CoralArmHardware.ALLOWED_CLOSED_LOOP_ERROR
+                );
         m_armController = m_armMotor.getClosedLoopController();
         m_armEncoder = m_armMotor.getEncoder();
         m_armMotorConfig.smartCurrentLimit((int)Constants.CoralArmHardware.ARM_MOTOR_CURRENT_LIMIT.in(Units.Amps));
@@ -169,7 +171,7 @@ public class CoralSubsystem extends StateMachine implements AutoCloseable {
             .maxAcceleration(750)
             .maxVelocity(750);
         m_coralMotorConfig.smartCurrentLimit((int)Constants.CoralArmHardware.ROLLER_MOTOR_CURRENT_LIMIT.in(Units.Amps));
-        m_coralMotor.configure(m_coralMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
+        m_coralMotor.configure(m_coralMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     }
 
     public static Hardware initializeHardware() {

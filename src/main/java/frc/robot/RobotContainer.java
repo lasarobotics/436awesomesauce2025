@@ -7,7 +7,7 @@ package frc.robot;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.coral.CoralSubsystem;
 import frc.robot.subsystems.drive.DriveSubsystem;
-import frc.robot.subsystems.algae.AlgaeSubsystem;
+// import frc.robot.subsystems.algae.AlgaeSubsystem;
 import frc.robot.subsystems.climb.ClimbSubsystem;
 
 import org.littletonrobotics.junction.Logger;
@@ -29,7 +29,7 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final CoralSubsystem m_coralSubsystem = CoralSubsystem.getInstance();
   // private final AlgaeSubsystem m_algaeSubsystem = AlgaeSubsystem.getInstance();
-  // private final ClimbSubsystem m_climbSubsystem = ClimbSubsystem.getInstance();  
+  private final ClimbSubsystem m_climbSubsystem = ClimbSubsystem.getInstance();  
   public final DriveSubsystem m_driveSubsystem = DriveSubsystem.getInstance();
 
 
@@ -79,10 +79,10 @@ public class RobotContainer {
     //   PRIMARY_CONTROLLER.a(),                 // descore algae
     //   PRIMARY_CONTROLLER.back()               // regurgitate
     // );
-    // m_climbSubsystem.configureBindings(
-    //   PRIMARY_CONTROLLER.x(),                 // cancel
-    //   PRIMARY_CONTROLLER.b()                  // climber management
-    // );
+    m_climbSubsystem.configureBindings(
+      PRIMARY_CONTROLLER.x(),                 // cancel
+      PRIMARY_CONTROLLER.b()                  // climber management
+    );
     m_coralSubsystem.configureBindings(
       PRIMARY_CONTROLLER.x(),                 // cancel
       PRIMARY_CONTROLLER.rightBumper(),       // intake coral

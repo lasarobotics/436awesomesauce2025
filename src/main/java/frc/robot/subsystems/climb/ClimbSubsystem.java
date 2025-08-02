@@ -141,7 +141,7 @@ public class ClimbSubsystem extends StateMachine implements AutoCloseable {
     }
 
     public boolean isClimberAtSetpoint(double setpoint) {
-        return m_climbMotor.getAbsoluteEncoder().getPosition() == setpoint;
+        return Math.abs(m_climbMotor.getAbsoluteEncoder().getPosition() - setpoint) < Constants.ClimbHardware.ALLOWED_CLOSED_LOOP_ERROR;
     }
 
     public void stopMotor() {

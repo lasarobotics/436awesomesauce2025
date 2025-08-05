@@ -31,19 +31,25 @@ public final class Constants {
     public static final Current ARM_MOTOR_CURRENT_LIMIT = Units.Amps.of(40);
     public static final Current ROLLER_MOTOR_CURRENT_LIMIT = Units.Amps.of(40);
     public static final Current ARM_STALL_CURRENT = Units.Amps.of(20);
-    public static final Current ROLLER_STALL_CURRENT = Units.Amps.of(35); // TODO check
+    public static final Current ROLLER_STALL_CURRENT = Units.Amps.of(30);
   }
 
   public static class CoralArmSetpoints {
-    public static final double STOW = 0.0; // TODO figure these out
-    public static final double SCORE = 0.0;
-    public static final double INTAKE = -15.0;
+    public static final double STOW = -0.5;
+    public static final double SCORE = -5.0;
+    public static final double INTAKE = -17.35;
   }
 
   public static class CoralArmPID {
-    public static final double P = 0.15;
+    public static final double P = 0.08;
     public static final double I = 0.0;
     public static final double D = 0.0;
+  }
+
+  public static class CoralArmConfig {
+    public static final double ROLLER_DEADBAND_TIME = 0.5;
+    public static final double ARM_MOTOR_DEADBAND_TIME = 0.5;
+    public static final double SCORE_EJECT_TIME = 0.25;
   }
 
   public static class ClimbHardware {
@@ -67,7 +73,7 @@ public final class Constants {
     public static final double MAX_SPEED = 4.4196; // 14.5 feet to meters
     public static final double DEADBAND = 0.1;
     public static final double TRANSLATION_SCALE = 0.8;
-    public static final double GIMP_SCALE = 0.05;
+    public static final double GIMP_SCALE = 0.1;
   }
 
   public static final class DriveConstants {

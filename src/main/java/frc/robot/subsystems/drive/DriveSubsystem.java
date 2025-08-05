@@ -94,6 +94,7 @@ public class DriveSubsystem extends StateMachine implements AutoCloseable {
         swerveDrive.periodic();
         Logger.recordOutput("DriveSubsystem/pose", swerveDrive.getPose());
         Logger.recordOutput("DriveSubsystem/heading", swerveDrive.getHeading());
+        Logger.recordOutput(getName() + "/state", getState().toString());
     }
 
     public void zeroGyro() {

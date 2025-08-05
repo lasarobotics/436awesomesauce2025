@@ -3,6 +3,8 @@ package frc.robot.subsystems.climb;
 import java.util.function.BooleanSupplier;
 import org.lasarobotics.fsm.StateMachine;
 import org.lasarobotics.fsm.SystemState;
+import org.littletonrobotics.junction.Logger;
+
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkMaxConfig;
@@ -146,6 +148,11 @@ public class ClimbSubsystem extends StateMachine implements AutoCloseable {
 
     public void stopMotor() {
         m_climbMotor.stopMotor();
+    }
+
+    @Override
+    public void periodic() {
+        Logger.recordOutput(getName() + "/state", getState().toString());
     }
 
     public void close() {

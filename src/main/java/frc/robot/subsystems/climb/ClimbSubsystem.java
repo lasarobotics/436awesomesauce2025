@@ -1,5 +1,8 @@
 package frc.robot.subsystems.climb;
 
+import static edu.wpi.first.units.Units.Percent;
+import static edu.wpi.first.units.Units.Value;
+
 import java.util.function.BooleanSupplier;
 import org.lasarobotics.fsm.StateMachine;
 import org.lasarobotics.fsm.SystemState;
@@ -8,22 +11,26 @@ import org.littletonrobotics.junction.Logger;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkMaxConfig;
-import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.ClosedLoopSlot;
-import com.revrobotics.spark.SparkClosedLoopController;
+import com.revrobotics.spark.SparkClosedLoopController.ArbFFUnits;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import edu.wpi.first.units.Units;
+import edu.wpi.first.units.measure.Dimensionless;
 import frc.robot.Constants;
 
 public class ClimbSubsystem extends StateMachine implements AutoCloseable {
     
     public static record Hardware (
         SparkMax climbMotor
-     ) {}
+    ) {}
+    
+    // CCW (positive) unspools, ideally
+    static final Dimensionless ARM_IN_SPEED = Percent.of(-30); // todo check this
+    static final Dimensionless ARM_OUT_SPEED = Percent.of(30); // todo check this
 
     public enum ClimbSubsystemStates implements SystemState {
         NOTHING {
@@ -47,34 +54,28 @@ public class ClimbSubsystem extends StateMachine implements AutoCloseable {
         EXTEND {
             @Override
             public void initialize() {
-                getInstance().sendClimberToSetpoint(Constants.ClimbMotorSetpoints.EXTEND);
+                getInstance().setClimbMotorToSpeed(ARM_IN_SPEED);
             }
 
             @Override
             public SystemState nextState() {
                 if (getInstance().m_climberManagementButton.getAsBoolean()) return RETRACT;
-                if (getInstance().m_cancelButton.getAsBoolean() ||
-                    getInstance().isClimberAtSetpoint(Constants.ClimbMotorSetpoints.EXTEND)) return REST;
+                if (getInstance().m_cancelButton.getAsBoolean()) return REST;
+
                 return this;
             }
         },
         RETRACT {
             @Override
             public void initialize() {
-                getInstance().sendClimberToSetpoint(Constants.ClimbMotorSetpoints.RETRACT);
-            }
-
-            public void execute() {
-                if (getInstance().isClimberAtSetpoint(Constants.ClimbMotorSetpoints.RETRACT)) {
-                    getInstance().stopMotor();
-                }
+                getInstance().setClimbMotorToSpeed(ARM_OUT_SPEED);
             }
 
             @Override
             public SystemState nextState() {
                 if (getInstance().m_climberManagementButton.getAsBoolean()) return EXTEND;
-                if (getInstance().m_cancelButton.getAsBoolean() ||
-                    getInstance().isClimberAtSetpoint(Constants.ClimbMotorSetpoints.RETRACT)) return REST;
+                if (getInstance().m_cancelButton.getAsBoolean()) return REST;
+
                 return this;
             }
         }
@@ -82,8 +83,6 @@ public class ClimbSubsystem extends StateMachine implements AutoCloseable {
 
     private static ClimbSubsystem s_climbSubsystemInstance;
     private final SparkMax m_climbMotor;
-    private final SparkClosedLoopController m_climbController;
-    private final RelativeEncoder m_climbEncoder;
     private final SparkMaxConfig m_climbConfig;
     private BooleanSupplier m_cancelButton;
     private BooleanSupplier m_climberManagementButton;
@@ -109,8 +108,6 @@ public class ClimbSubsystem extends StateMachine implements AutoCloseable {
                 .allowedClosedLoopError(
                     Constants.ClimbHardware.ALLOWED_CLOSED_LOOP_ERROR
                 );
-        m_climbController = m_climbMotor.getClosedLoopController();
-        m_climbEncoder = m_climbMotor.getEncoder();
         m_climbConfig.smartCurrentLimit((int)Constants.ClimbHardware.CLIMB_MOTOR_CURRENT_LIMIT.in(Units.Amps));
         m_climbMotor.configure(m_climbConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     }
@@ -130,20 +127,8 @@ public class ClimbSubsystem extends StateMachine implements AutoCloseable {
         m_climberManagementButton = climberManagementButton;
     }
 
-    public void zeroRelativeEncoders() {
-        m_climbEncoder.setPosition(0.0);
-    }
-
-    public void sendClimberToSetpoint(double setpoint) {
-        m_climbController.setReference(
-            setpoint,
-            ControlType.kMAXMotionPositionControl,
-            ClosedLoopSlot.kSlot0
-        );
-    }
-
-    public boolean isClimberAtSetpoint(double setpoint) {
-        return Math.abs(m_climbMotor.getAbsoluteEncoder().getPosition() - setpoint) < Constants.ClimbHardware.ALLOWED_CLOSED_LOOP_ERROR;
+    public void setClimbMotorToSpeed(Dimensionless speed) {
+        m_climbMotor.getClosedLoopController().setReference(speed.in(Value), ControlType.kDutyCycle, ClosedLoopSlot.kSlot0, 0.0, ArbFFUnits.kVoltage);
     }
 
     public void stopMotor() {

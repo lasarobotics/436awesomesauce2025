@@ -71,6 +71,7 @@ public class CoralSubsystem extends StateMachine implements AutoCloseable {
             @Override
             public SystemState nextState() {
                 if (getInstance().m_intakeCoralButton.getAsBoolean()) return INTAKE;
+                if (getInstance().m_intakeHighButton.getAsBoolean()) return INTAKE_HIGH;
                 if (getInstance().m_scoreCoralButton.getAsBoolean()) return SCORE;
                 if (getInstance().m_regurgitateButton.getAsBoolean()) return REGURGITATE;
 
@@ -92,6 +93,32 @@ public class CoralSubsystem extends StateMachine implements AutoCloseable {
             @Override
             public SystemState nextState() {
                 if (getInstance().m_cancelButton.getAsBoolean()) return REST;
+                if (getInstance().m_intakeHighButton.getAsBoolean()) return INTAKE_HIGH;
+                if (getInstance().m_scoreCoralButton.getAsBoolean()) return SCORE;
+                if (getInstance().m_regurgitateButton.getAsBoolean()) return REGURGITATE;
+
+                if (m_intaketimer.hasElapsed(Constants.CoralArmConfig.ROLLER_DEADBAND_TIME)
+                    && getInstance().intakeIsStalled()) return REST;
+
+                return this;
+            }
+        },
+        INTAKE_HIGH {
+            static Timer m_intaketimer = new Timer();
+
+            @Override
+            public void initialize() {
+                getInstance().sendArmToSetpoint(Constants.CoralArmSetpoints.INTAKE_HIGH);
+                getInstance().setMotorToSpeed(INTAKE_MOTOR_SPEED);
+
+                m_intaketimer.reset();
+                m_intaketimer.start();
+            }
+
+            @Override
+            public SystemState nextState() {
+                if (getInstance().m_cancelButton.getAsBoolean()) return REST;
+                if (getInstance().m_intakeCoralButton.getAsBoolean()) return INTAKE;
                 if (getInstance().m_scoreCoralButton.getAsBoolean()) return SCORE;
                 if (getInstance().m_regurgitateButton.getAsBoolean()) return REGURGITATE;
 
@@ -124,6 +151,7 @@ public class CoralSubsystem extends StateMachine implements AutoCloseable {
             public SystemState nextState() {
                 if (getInstance().m_cancelButton.getAsBoolean()) return REST;
                 if (getInstance().m_intakeCoralButton.getAsBoolean()) return INTAKE;
+                if (getInstance().m_intakeHighButton.getAsBoolean()) return INTAKE_HIGH;
                 if (getInstance().m_regurgitateButton.getAsBoolean()) return REGURGITATE;
 
                 return this;
@@ -139,6 +167,7 @@ public class CoralSubsystem extends StateMachine implements AutoCloseable {
             public SystemState nextState() {
                 if (getInstance().m_cancelButton.getAsBoolean()) return REST;
                 if (getInstance().m_intakeCoralButton.getAsBoolean()) return INTAKE;
+                if (getInstance().m_intakeHighButton.getAsBoolean()) return INTAKE_HIGH;
                 if (getInstance().m_scoreCoralButton.getAsBoolean()) return SCORE;
 
                 return this;
@@ -155,6 +184,7 @@ public class CoralSubsystem extends StateMachine implements AutoCloseable {
     private final SparkMaxConfig m_armMotorConfig;
     private BooleanSupplier m_cancelButton;
     private BooleanSupplier m_intakeCoralButton;
+    private BooleanSupplier m_intakeHighButton;
     private BooleanSupplier m_scoreCoralButton;
     private BooleanSupplier m_regurgitateButton;
 
@@ -206,11 +236,13 @@ public class CoralSubsystem extends StateMachine implements AutoCloseable {
     public void configureBindings(
         BooleanSupplier cancelButton,
         BooleanSupplier intakeCoralButton,
+        BooleanSupplier intakeHighButton,
         BooleanSupplier scoreCoralButton,
         BooleanSupplier regurgitateButton
     ) {
         m_cancelButton = cancelButton;
         m_intakeCoralButton = intakeCoralButton;
+        m_intakeHighButton = intakeHighButton;
         m_scoreCoralButton = scoreCoralButton;
         m_regurgitateButton = regurgitateButton;
     }

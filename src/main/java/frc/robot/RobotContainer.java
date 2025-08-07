@@ -86,6 +86,7 @@ public class RobotContainer {
     m_coralSubsystem.configureBindings(
       PRIMARY_CONTROLLER.x(),                 // cancel
       PRIMARY_CONTROLLER.rightBumper(),       // intake coral
+      PRIMARY_CONTROLLER.y(),
       PRIMARY_CONTROLLER.rightTrigger(),      // score coral
       PRIMARY_CONTROLLER.back()               // regurgitate
     );

@@ -28,7 +28,6 @@ public class RobotContainer {
       new CommandXboxController(OperatorConstants.kDriverControllerPort);
   // The robot's subsystems and commands are defined here...
   private final CoralSubsystem m_coralSubsystem = CoralSubsystem.getInstance();
-  // private final AlgaeSubsystem m_algaeSubsystem = AlgaeSubsystem.getInstance();
   private final ClimbSubsystem m_climbSubsystem = ClimbSubsystem.getInstance();  
   public final DriveSubsystem m_driveSubsystem = DriveSubsystem.getInstance();
 
@@ -72,13 +71,6 @@ public class RobotContainer {
       },    // drive rotate
       PRIMARY_CONTROLLER.start()
     );
-    // m_algaeSubsystem.configureBindings(
-    //   PRIMARY_CONTROLLER.x(),                 // cancel
-    //   PRIMARY_CONTROLLER.leftBumper(),        // intake algae
-    //   PRIMARY_CONTROLLER.leftTrigger(),       // shoot algae
-    //   PRIMARY_CONTROLLER.a(),                 // descore algae
-    //   PRIMARY_CONTROLLER.back()               // regurgitate
-    // );
     m_climbSubsystem.configureBindings(
       PRIMARY_CONTROLLER.x(),                 // cancel
       PRIMARY_CONTROLLER.b()                  // climber management
@@ -93,9 +85,7 @@ public class RobotContainer {
   }
 
   private void zeroRelativeEncoders() {
-    // m_algaeSubsystem.zeroRelativeEncoders();
     m_coralSubsystem.zeroRelativeEncoders();
-    // m_climbSubsystem.zeroRelativeEncoders();
     m_driveSubsystem.zeroGyro();
   }
 }

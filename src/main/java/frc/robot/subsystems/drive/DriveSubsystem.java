@@ -26,6 +26,14 @@ public class DriveSubsystem extends StateMachine implements AutoCloseable {
         },
         AUTO {
             @Override
+            public void execute() {
+                // left stick forward 0.1
+                // horizontally centered
+                // no rotation
+                getInstance().drive(0.1, 0, 0);
+            }
+
+            @Override
             public SystemState nextState() {
                 if (DriverStation.isAutonomous()) return this;
 
@@ -60,7 +68,7 @@ public class DriveSubsystem extends StateMachine implements AutoCloseable {
 
     public DriveSubsystem(
             File directory) {
-        super(DriveSubsystemStates.TELEOP);
+        super(DriveSubsystemStates.AUTO);
         swerveDrive = new MAXSwerve();
     }
 
@@ -87,6 +95,19 @@ public class DriveSubsystem extends StateMachine implements AutoCloseable {
             true
         );
     }
+
+    public void drive(double leftX, double leftY, double rightX) {
+        Logger.recordOutput("DriveSubsystem/DriveManual/LeftX", m_leftX.getAsDouble());
+        Logger.recordOutput("DriveSubsystem/DriveManual/LeftY", m_leftY.getAsDouble());
+        Logger.recordOutput("DriveSubsystem/DriveManual/RightX", m_rightX.getAsDouble());
+        
+        swerveDrive.drive(
+            leftX * Constants.Swerve.GIMP_SCALE * Constants.DriveConstants.kMaxSpeedMetersPerSecond * Constants.Swerve.TRANSLATION_SCALE,
+            leftY * Constants.Swerve.GIMP_SCALE * Constants.DriveConstants.kMaxSpeedMetersPerSecond * Constants.Swerve.TRANSLATION_SCALE,
+            rightX * Constants.Swerve.GIMP_SCALE * Constants.DriveConstants.kMaxAngularSpeed,
+            true
+        );
+    } 
 
     public void periodic() {
         if (m_reset.getAsBoolean())

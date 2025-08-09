@@ -16,6 +16,7 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Dimensionless;
+import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Constants;
 
 public class ClimbSubsystem extends StateMachine implements AutoCloseable {
@@ -48,28 +49,40 @@ public class ClimbSubsystem extends StateMachine implements AutoCloseable {
             }
         },
         EXTEND {
+            Timer m_deadbandTimer = new Timer();
+
             @Override
             public void initialize() {
                 getInstance().setClimbMotorToSpeed(ARM_IN_SPEED);
+
+                m_deadbandTimer.reset();
+                m_deadbandTimer.start();
             }
 
             @Override
             public SystemState nextState() {
-                if (getInstance().m_climberManagementButton.getAsBoolean()) return RETRACT;
+                if (getInstance().m_climberManagementButton.getAsBoolean()
+                    && m_deadbandTimer.hasElapsed(Constants.ClimbHardware.DEADBAND_TIME)) return RETRACT;
                 if (getInstance().m_cancelButton.getAsBoolean()) return REST;
 
                 return this;
             }
         },
         RETRACT {
+            Timer m_deadbandTimer = new Timer();
+
             @Override
             public void initialize() {
                 getInstance().setClimbMotorToSpeed(ARM_OUT_SPEED);
+
+                m_deadbandTimer.reset();
+                m_deadbandTimer.start();
             }
 
             @Override
             public SystemState nextState() {
-                if (getInstance().m_climberManagementButton.getAsBoolean()) return EXTEND;
+                if (getInstance().m_climberManagementButton.getAsBoolean()
+                    && m_deadbandTimer.hasElapsed(Constants.ClimbHardware.DEADBAND_TIME)) return EXTEND;
                 if (getInstance().m_cancelButton.getAsBoolean()) return REST;
 
                 return this;

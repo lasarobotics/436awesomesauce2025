@@ -39,10 +39,11 @@ public class DriveSubsystem extends StateMachine implements AutoCloseable {
                 if (m_autoTimer.hasElapsed(Constants.Swerve.AUTO_DRIVE_TIME)) {
                     return;
                 }
-                // left stick forward 0.1
+                // left stick backwards 0.25
+                // (towards the driver station)
                 // horizontally centered
                 // no rotation
-                getInstance().drive(0.25, 0, 0);
+                getInstance().drive(-0.25, 0, 0);
             }
 
             @Override

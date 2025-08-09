@@ -118,7 +118,8 @@ public class ClimbSubsystem extends StateMachine implements AutoCloseable {
     }
 
     public void setClimbMotorToSpeed(Dimensionless speed) {
-        m_climbMotor.getClosedLoopController().setReference(speed.in(Value), ControlType.kDutyCycle, ClosedLoopSlot.kSlot0, 0.0, ArbFFUnits.kVoltage);
+        // m_climbMotor.getClosedLoopController().setReference(speed.in(Value), ControlType.kDutyCycle, ClosedLoopSlot.kSlot0, 0.0, ArbFFUnits.kVoltage);
+        m_climbMotor.set(speed.in(Value));
     }
 
     public void stopMotor() {

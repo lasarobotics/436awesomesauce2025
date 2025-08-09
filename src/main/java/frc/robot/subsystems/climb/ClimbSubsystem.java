@@ -152,7 +152,7 @@ public class ClimbSubsystem extends StateMachine implements AutoCloseable {
     @Override
     public void periodic() {
         Logger.recordOutput(getName() + "/state", getState().toString());
-        Logger.recordOutput(getName() + "/current", getInstance().m_climbMotor.getBusVoltage());
+        Logger.recordOutput(getName() + "/voltage", getInstance().m_climbMotor.getBusVoltage());
         Logger.recordOutput(getName() + "/spark", getInstance().m_climbMotor.get());
         Logger.recordOutput(getName() + "/forwardLimit", m_climbMotor.getForwardLimitSwitch().isPressed());
         Logger.recordOutput(getName() + "/reverseLimit", m_climbMotor.getReverseLimitSwitch().isPressed());

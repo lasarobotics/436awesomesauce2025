@@ -52,40 +52,48 @@ public class ClimbSubsystem extends StateMachine implements AutoCloseable {
         },
         EXTEND {
             Timer m_deadbandTimer = new Timer();
+            Timer m_delayTimer = new Timer();
 
             @Override
             public void initialize() {
                 getInstance().setClimbMotorToSpeed(ARM_IN_SPEED);
 
                 m_deadbandTimer.reset();
+                m_delayTimer.reset();
                 m_deadbandTimer.start();
+                m_delayTimer.start();
             }
 
             @Override
             public SystemState nextState() {
                 if (getInstance().m_climberManagementButton.getAsBoolean()
                     && m_deadbandTimer.hasElapsed(Constants.ClimbHardware.DEADBAND_TIME)) return RETRACT;
-                if (getInstance().m_cancelButton.getAsBoolean()) return REST;
+                if (getInstance().m_cancelButton.getAsBoolean()
+                    || m_delayTimer.hasElapsed(Constants.ClimbHardware.END_TIMEOUT)) return REST;
 
                 return this;
             }
         },
         RETRACT {
             Timer m_deadbandTimer = new Timer();
+            Timer m_delayTimer = new Timer();
 
             @Override
             public void initialize() {
                 getInstance().setClimbMotorToSpeed(ARM_OUT_SPEED);
 
                 m_deadbandTimer.reset();
+                m_delayTimer.reset();
                 m_deadbandTimer.start();
+                m_delayTimer.start();
             }
 
             @Override
             public SystemState nextState() {
                 if (getInstance().m_climberManagementButton.getAsBoolean()
                     && m_deadbandTimer.hasElapsed(Constants.ClimbHardware.DEADBAND_TIME)) return EXTEND;
-                if (getInstance().m_cancelButton.getAsBoolean()) return REST;
+                if (getInstance().m_cancelButton.getAsBoolean()
+                    || m_delayTimer.hasElapsed(Constants.ClimbHardware.END_TIMEOUT)) return REST;
 
                 return this;
             }

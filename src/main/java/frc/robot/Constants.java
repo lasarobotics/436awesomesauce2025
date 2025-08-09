@@ -38,7 +38,7 @@ public final class Constants {
     public static final double STOW = -0.5;
     public static final double SCORE = -5.0;
     public static final double INTAKE = -17.35;
-    public static final double INTAKE_HIGH = -3.0;
+    public static final double INTAKE_HIGH = -2.5;
   }
 
   public static class CoralArmPID {
@@ -57,6 +57,7 @@ public final class Constants {
     public static final int CLIMB_MOTOR_ID = 61;
     public static final Current CLIMB_MOTOR_CURRENT_LIMIT = Units.Amps.of(70);
     public static final double DEADBAND_TIME = 0.3;
+    public static final double END_TIMEOUT = 2;
   }
   
   public static class Swerve {

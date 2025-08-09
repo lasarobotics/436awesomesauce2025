@@ -11,6 +11,7 @@ import org.lasarobotics.fsm.StateMachine;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Constants;
 
 public class DriveSubsystem extends StateMachine implements AutoCloseable {
@@ -25,12 +26,23 @@ public class DriveSubsystem extends StateMachine implements AutoCloseable {
             }
         },
         AUTO {
+            Timer m_autoTimer = new Timer();
+
+            @Override
+            public void initialize() {
+                m_autoTimer.reset();
+                m_autoTimer.start();
+            }
+
             @Override
             public void execute() {
+                if (m_autoTimer.hasElapsed(Constants.Swerve.AUTO_DRIVE_TIME)) {
+                    return;
+                }
                 // left stick forward 0.1
                 // horizontally centered
                 // no rotation
-                getInstance().drive(0.1, 0, 0);
+                getInstance().drive(0.25, 0, 0);
             }
 
             @Override

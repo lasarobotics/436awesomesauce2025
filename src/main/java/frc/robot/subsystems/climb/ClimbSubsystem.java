@@ -46,7 +46,7 @@ public class ClimbSubsystem extends StateMachine implements AutoCloseable {
 
             @Override
             public SystemState nextState() {
-                if (getInstance().m_climberManagementButton.getAsBoolean()) return RETRACT;
+                if (getInstance().m_climberManagementButton.getAsBoolean()) return EXTEND;
                 return this;
             }
         },
@@ -110,8 +110,8 @@ public class ClimbSubsystem extends StateMachine implements AutoCloseable {
         m_climbMotor = hardware.climbMotor;
 
         m_climbConfig = new SparkMaxConfig();
-        m_climbConfig.limitSwitch.forwardLimitSwitchType(Type.kNormallyOpen);
-        m_climbConfig.limitSwitch.reverseLimitSwitchType(Type.kNormallyClosed);
+        m_climbConfig.limitSwitch.forwardLimitSwitchType(Type.kNormallyClosed);
+        m_climbConfig.limitSwitch.reverseLimitSwitchType(Type.kNormallyOpen);
         m_climbConfig.idleMode(IdleMode.kBrake);
         m_climbConfig.smartCurrentLimit((int)Constants.ClimbHardware.CLIMB_MOTOR_CURRENT_LIMIT.in(Units.Amps));
         m_climbMotor.configure(m_climbConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);

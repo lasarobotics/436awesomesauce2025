@@ -56,7 +56,7 @@ public final class Constants {
   public static class ClimbHardware {
     public static final int CLIMB_MOTOR_ID = 61;
     public static final Current CLIMB_MOTOR_CURRENT_LIMIT = Units.Amps.of(70);
-    public static final double DEADBAND_TIME = 0.1;
+    public static final double DEADBAND_TIME = 0.3;
   }
   
   public static class Swerve {

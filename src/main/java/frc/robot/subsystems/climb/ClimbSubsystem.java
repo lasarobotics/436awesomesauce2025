@@ -9,7 +9,6 @@ import org.lasarobotics.fsm.SystemState;
 import org.littletonrobotics.junction.Logger;
 
 import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkClosedLoopController.ArbFFUnits;
@@ -99,15 +98,6 @@ public class ClimbSubsystem extends StateMachine implements AutoCloseable {
         m_climbMotor = hardware.climbMotor;
 
         m_climbConfig = new SparkMaxConfig();
-        m_climbConfig.closedLoop
-            .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-            .pid(Constants.ClimbPID.P,
-                 Constants.ClimbPID.I,
-                 Constants.ClimbPID.D)
-            .maxMotion
-                .allowedClosedLoopError(
-                    Constants.ClimbHardware.ALLOWED_CLOSED_LOOP_ERROR
-                );
         m_climbConfig.smartCurrentLimit((int)Constants.ClimbHardware.CLIMB_MOTOR_CURRENT_LIMIT.in(Units.Amps));
         m_climbMotor.configure(m_climbConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     }

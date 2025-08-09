@@ -55,21 +55,9 @@ public final class Constants {
 
   public static class ClimbHardware {
     public static final int CLIMB_MOTOR_ID = 61;
-    public static final Current CLIMB_MOTOR_CURRENT_LIMIT = Units.Amps.of(20);
-    public static final double ALLOWED_CLOSED_LOOP_ERROR = 0.05;
-  }
-
-  public static class ClimbMotorSetpoints {
-    public static final double EXTEND = 0.0; // TODO figure these out
-    public static final double RETRACT = 0.0;
+    public static final Current CLIMB_MOTOR_CURRENT_LIMIT = Units.Amps.of(70);
   }
   
-  public static class ClimbPID {
-    public static final double P = 0.15;  // TODO verify these
-    public static final double I = 0.0;
-    public static final double D = 0.0;
-  }
-
   public static class Swerve {
     public static final double MAX_SPEED = 4.4196; // 14.5 feet to meters
     public static final double DEADBAND = 0.1;

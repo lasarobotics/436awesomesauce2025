@@ -10,9 +10,6 @@ import org.littletonrobotics.junction.Logger;
 
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
-import com.revrobotics.spark.ClosedLoopSlot;
-import com.revrobotics.spark.SparkClosedLoopController.ArbFFUnits;
-import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
@@ -27,7 +24,7 @@ public class ClimbSubsystem extends StateMachine implements AutoCloseable {
         SparkMax climbMotor
     ) {}
     
-    // CCW (positive) unspools, ideally
+    // CCW (positive) unspools, ideally (IT DEPENDS)
     static final Dimensionless ARM_IN_SPEED = Percent.of(-30); // todo check this
     static final Dimensionless ARM_OUT_SPEED = Percent.of(30); // todo check this
 
@@ -118,7 +115,6 @@ public class ClimbSubsystem extends StateMachine implements AutoCloseable {
     }
 
     public void setClimbMotorToSpeed(Dimensionless speed) {
-        // m_climbMotor.getClosedLoopController().setReference(speed.in(Value), ControlType.kDutyCycle, ClosedLoopSlot.kSlot0, 0.0, ArbFFUnits.kVoltage);
         m_climbMotor.set(speed.in(Value));
     }
 

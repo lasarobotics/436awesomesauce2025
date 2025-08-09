@@ -24,6 +24,7 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Dimensionless;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Constants;
 
@@ -43,6 +44,36 @@ public class CoralSubsystem extends StateMachine implements AutoCloseable {
             @Override
             public SystemState nextState() {
                 return this;
+            }
+        },
+        AUTO {
+            
+            Timer m_autoTimer = new Timer();
+
+            @Override
+            public void initialize() {
+                m_autoTimer.reset();
+                m_autoTimer.start();
+            }
+
+            @Override
+            public void execute() {
+                // TODO make this code pretty
+                if (m_autoTimer.hasElapsed(Constants.Swerve.AUTO_DRIVE_TIME + 1)) {
+                    getInstance().sendArmToSetpoint(Constants.CoralArmSetpoints.STOW);
+                    getInstance().stopMotor();
+                } else if (m_autoTimer.hasElapsed(Constants.Swerve.AUTO_DRIVE_TIME + 0.2)) {
+                    getInstance().setMotorToSpeed(SCORE_MOTOR_SPEED);
+                } else if (m_autoTimer.hasElapsed(Constants.Swerve.AUTO_DRIVE_TIME)) {
+                    getInstance().sendArmToSetpoint(Constants.CoralArmSetpoints.SCORE);
+                }
+            }
+
+            @Override
+            public SystemState nextState() {
+                if (DriverStation.isAutonomous()) return this;
+
+                return REST;
             }
         },
         REST {
@@ -233,7 +264,7 @@ public class CoralSubsystem extends StateMachine implements AutoCloseable {
     }
 
     public CoralSubsystem(Hardware hardware) {
-        super(CoralSubsystemStates.REST);
+        super(CoralSubsystemStates.AUTO);
         m_coralMotor = hardware.coralMotor;
         m_armMotor = hardware.armMotor;
 

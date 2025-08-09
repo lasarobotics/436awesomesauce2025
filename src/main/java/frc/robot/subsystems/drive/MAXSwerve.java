@@ -164,6 +164,10 @@ public class MAXSwerve {
     m_gyro.reset();
   }
 
+  public void offset180() {
+    m_gyro.setAngleAdjustment(180);
+  }
+
   /**
    * Returns the heading of the robot.
    *

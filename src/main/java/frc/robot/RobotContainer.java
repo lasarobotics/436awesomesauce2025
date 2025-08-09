@@ -36,6 +36,7 @@ public class RobotContainer {
     // Configure the trigger bindings
     configureBindings();
     zeroRelativeEncoders();
+    m_driveSubsystem.offset180();
   }
 
   /**

@@ -38,7 +38,7 @@ public final class Constants {
     public static final double STOW = -0.5;
     public static final double SCORE = -5.0;
     public static final double INTAKE = -17.35;
-    public static final double INTAKE_HIGH = -5.0;
+    public static final double INTAKE_HIGH = -3.0;
   }
 
   public static class CoralArmPID {

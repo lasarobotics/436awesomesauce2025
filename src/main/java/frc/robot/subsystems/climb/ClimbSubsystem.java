@@ -143,6 +143,8 @@ public class ClimbSubsystem extends StateMachine implements AutoCloseable {
         Logger.recordOutput(getName() + "/state", getState().toString());
         Logger.recordOutput(getName() + "/current", getInstance().m_climbMotor.getBusVoltage());
         Logger.recordOutput(getName() + "/spark", getInstance().m_climbMotor.get());
+        // todo figure out how to get limit switch state
+        // Logger.recordOutput(getName() + "/encoder", m_climbMotor.getAbsoluteEncoder().getPosition());
     }
 
     public void close() {

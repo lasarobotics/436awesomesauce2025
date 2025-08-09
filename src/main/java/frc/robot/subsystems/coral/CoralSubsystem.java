@@ -51,7 +51,6 @@ public class CoralSubsystem extends StateMachine implements AutoCloseable {
             @Override
             public void initialize() {
                 getInstance().stopMotor();
-                // getInstance().sendArmToSetpoint(Constants.CoralArmSetpoints.STOW);
                 getInstance().setArmToGoBack();
 
                 m_armZeroTimer.reset();
@@ -61,7 +60,7 @@ public class CoralSubsystem extends StateMachine implements AutoCloseable {
             @Override
             public void execute() {
                 if (m_armZeroTimer.hasElapsed(Constants.CoralArmConfig.ARM_MOTOR_DEADBAND_TIME)
-                    && Units.Amps.of(getInstance().m_armMotor.getOutputCurrent()).gte(Constants.CoralArmHardware.ARM_STALL_CURRENT)) {
+                    && getInstance().armIsStalled()) {
                     getInstance().zeroRelativeEncoders();
                     getInstance().m_armMotor.stopMotor();
                     getInstance().sendArmToSetpoint(Constants.CoralArmSetpoints.STOW);
@@ -70,6 +69,43 @@ public class CoralSubsystem extends StateMachine implements AutoCloseable {
 
             @Override
             public SystemState nextState() {
+                if (getInstance().m_intakeCoralButton.getAsBoolean()) return INTAKE;
+                if (getInstance().m_intakeHighButton.getAsBoolean()) return INTAKE_HIGH;
+                if (getInstance().m_scoreCoralButton.getAsBoolean()) return SCORE;
+                if (getInstance().m_regurgitateButton.getAsBoolean()) return REGURGITATE;
+                if (getInstance().m_emergencyRetractButton.getAsBoolean()) return EMERGENCY_RETRACT;
+
+                return this;
+            }
+        },
+        EMERGENCY_RETRACT {
+            static Timer m_armZeroTimer = new Timer();
+
+            @Override
+            public void initialize() {
+                getInstance().stopMotor();
+                getInstance().setArmToGoBack();
+
+                m_armZeroTimer.reset();
+                m_armZeroTimer.start();
+            }
+
+            @Override
+            public void execute() {
+                if (m_armZeroTimer.hasElapsed(Constants.CoralArmConfig.ARM_MOTOR_DEADBAND_TIME * 2)
+                    && getInstance().armIsStalled()) {
+                    getInstance().zeroRelativeEncoders();
+                    getInstance().m_armMotor.stopMotor();
+                    getInstance().sendArmToSetpoint(Constants.CoralArmSetpoints.STOW);
+                }
+            }
+
+            @Override
+            public SystemState nextState() {
+                if (getInstance().m_cancelButton.getAsBoolean() || (
+                    m_armZeroTimer.hasElapsed(Constants.CoralArmConfig.ARM_MOTOR_DEADBAND_TIME * 2)
+                    && getInstance().armIsStalled()
+                )) return REST;
                 if (getInstance().m_intakeCoralButton.getAsBoolean()) return INTAKE;
                 if (getInstance().m_intakeHighButton.getAsBoolean()) return INTAKE_HIGH;
                 if (getInstance().m_scoreCoralButton.getAsBoolean()) return SCORE;
@@ -187,6 +223,7 @@ public class CoralSubsystem extends StateMachine implements AutoCloseable {
     private BooleanSupplier m_intakeHighButton;
     private BooleanSupplier m_scoreCoralButton;
     private BooleanSupplier m_regurgitateButton;
+    private BooleanSupplier m_emergencyRetractButton;
 
     public static CoralSubsystem getInstance() {
         if (s_coralSubsystemInstance == null) {
@@ -238,13 +275,15 @@ public class CoralSubsystem extends StateMachine implements AutoCloseable {
         BooleanSupplier intakeCoralButton,
         BooleanSupplier intakeHighButton,
         BooleanSupplier scoreCoralButton,
-        BooleanSupplier regurgitateButton
+        BooleanSupplier regurgitateButton,
+        BooleanSupplier retractButton
     ) {
         m_cancelButton = cancelButton;
         m_intakeCoralButton = intakeCoralButton;
         m_intakeHighButton = intakeHighButton;
         m_scoreCoralButton = scoreCoralButton;
         m_regurgitateButton = regurgitateButton;
+        m_emergencyRetractButton = retractButton;
     }
 
     public void zeroRelativeEncoders() {
@@ -257,6 +296,10 @@ public class CoralSubsystem extends StateMachine implements AutoCloseable {
 
     public void setMotorToSpeed(Dimensionless speed) {
         m_coralMotor.getClosedLoopController().setReference(speed.in(Value), ControlType.kDutyCycle, ClosedLoopSlot.kSlot0, 0.0, ArbFFUnits.kVoltage);
+    }
+
+    public boolean armIsStalled() {
+        return Units.Amps.of(getInstance().m_armMotor.getOutputCurrent()).gte(Constants.CoralArmHardware.ARM_STALL_CURRENT);
     }
 
     public boolean intakeIsStalled() {

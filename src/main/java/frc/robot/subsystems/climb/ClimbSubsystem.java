@@ -26,8 +26,8 @@ public class ClimbSubsystem extends StateMachine implements AutoCloseable {
     ) {}
     
     // CCW (positive) unspools, ideally (IT DEPENDS)
-    static final Dimensionless ARM_IN_SPEED = Percent.of(-30); // todo check this
-    static final Dimensionless ARM_OUT_SPEED = Percent.of(30); // todo check this
+    static final Dimensionless ARM_IN_SPEED = Percent.of(-100); // todo check this
+    static final Dimensionless ARM_OUT_SPEED = Percent.of(100); // todo check this
 
     public enum ClimbSubsystemStates implements SystemState {
         NOTHING {
@@ -129,6 +129,7 @@ public class ClimbSubsystem extends StateMachine implements AutoCloseable {
 
     public void setClimbMotorToSpeed(Dimensionless speed) {
         m_climbMotor.set(speed.in(Value));
+        Logger.recordOutput(getName() + "/setSpeed", speed);
     }
 
     public void stopMotor() {
@@ -138,6 +139,8 @@ public class ClimbSubsystem extends StateMachine implements AutoCloseable {
     @Override
     public void periodic() {
         Logger.recordOutput(getName() + "/state", getState().toString());
+        Logger.recordOutput(getName() + "/current", getInstance().m_climbMotor.getBusVoltage());
+        Logger.recordOutput(getName() + "/spark", getInstance().m_climbMotor.get());
     }
 
     public void close() {

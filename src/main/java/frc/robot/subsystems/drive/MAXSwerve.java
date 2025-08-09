@@ -162,6 +162,7 @@ public class MAXSwerve {
   /** Zeroes the heading of the robot. */
   public void zeroHeading() {
     m_gyro.reset();
+    // Figure out how to zero correctly TODO
     m_gyro.setAngleAdjustment(0);
   }
 

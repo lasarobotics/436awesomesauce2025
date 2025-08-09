@@ -41,7 +41,7 @@ public class DriveSubsystem extends StateMachine implements AutoCloseable {
                     // (towards the driver station)
                     // horizontally centered
                     // no rotation
-                    getInstance().drive(0, -0.5, 0);
+                    getInstance().drive(0, Constants.Swerve.AUTO_FORWARD_SPEED, 0);
                 } else {
                     getInstance().drive(0, 0, 0);
                 }

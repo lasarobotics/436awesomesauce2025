@@ -56,17 +56,17 @@ public final class Constants {
   public static class ClimbHardware {
     public static final int CLIMB_MOTOR_ID = 61;
     public static final Current CLIMB_MOTOR_CURRENT_LIMIT = Units.Amps.of(70);
-    public static final double DEADBAND_TIME = 0.3;
+    public static final double DEADBAND_TIME = 0.25;
     public static final double END_TIMEOUT = 2;
   }
   
   public static class Swerve {
     public static final double MAX_SPEED = 4.4196; // 14.5 feet to meters
-    public static final double DEADBAND = 0.1;
+    public static final double DEADBAND = 0.08;
     public static final double TRANSLATION_SCALE = 0.8;
-    public static final double GIMP_SCALE = 0.65;
-    public static final double AUTO_DRIVE_TIME = 1.5;
-    public static final double AUTO_FORWARD_SPEED = -0.25;
+    public static final double GIMP_SCALE = 0.45;
+    public static final double AUTO_DRIVE_TIME = 2.5;
+    public static final double AUTO_FORWARD_SPEED = -0.1;
   }
 
   public static final class DriveConstants {

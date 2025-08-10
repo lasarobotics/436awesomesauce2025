@@ -65,8 +65,8 @@ public final class Constants {
     public static final double DEADBAND = 0.08;
     public static final double TRANSLATION_SCALE = 0.8;
     public static final double GIMP_SCALE = 0.45;
-    public static final double AUTO_DRIVE_TIME = 2.5;
-    public static final double AUTO_FORWARD_SPEED = -0.1;
+    public static final double AUTO_DRIVE_TIME = 2;
+    public static final double AUTO_FORWARD_SPEED = -0.15;
   }
 
   public static final class DriveConstants {

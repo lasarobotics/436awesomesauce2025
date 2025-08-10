@@ -1,6 +1,6 @@
 # 436 (Purplexity) Robot Code
 
-created using finite state machines (courtesy of purplelib) and yagsl
+created using finite state machines (courtesy of purplelib) ~~and yagsl~~
 
 ## notes
  - currently, swerve config is taken straight from src/main/deploy/swerve/maxSwerve in https://github.com/BroncBotz3481/YAGSL-Example
